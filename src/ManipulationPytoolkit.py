@@ -82,8 +82,6 @@ class ManipulationPytoolkit:
             angle = [1.0]
         elif(name == "close_left_hand"):
             angle = [0.0]
-        elif(name == "open_right_hand"):
-            angle = [0.0, 0.0]
         
         # Right Hand
 
