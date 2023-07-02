@@ -42,9 +42,9 @@ class ManipulationPytoolkit:
         joint_hands = ["LHand", "RHand"]
         
         # Arms
-        if(name=="between_both_arms_1"):
+        if(name=="box"):
             angle = [-0.00380663, 0.349535, 0.00386407, -0.51711, -1.82379, -0.00378216, -0.352371, 0.00378624, 0.00378624, 1.82381]
-        elif(name == "between_both_arms_2"):
+        elif(name == "cylinder"):
             angle = [-0.00375922, 0.176294, 0.00380024, -0.86908, -1.82386, -0.00389758, -0.167802, -0.0038681, 0.87481, 1.82387]
         elif(name == "hold_both_arms_1"):
             angle = [0.00385635, 0.00875869, -0.529993, -0.176235, -1.82385, -0.00372891, -0.00874921, 0.522316, 0.182004, 1.82386]
@@ -52,9 +52,9 @@ class ManipulationPytoolkit:
             angle = [0.430887, 0.00880139, -0.712923, -0.525612, -1.82379, 0.438531, -0.00874419, 0.697761, 0.531296, 1.82379]
         elif(name == "hold_both_arms_3"):
             angle = [0.334408, 0.0352817, -0.707165, -0.863631, -1.84084, 0.342078, -0.0475533, 0.710233, 0.857495, 1.83769]
-        elif(name == "carry_left_arm_1"):
+        elif(name == "small_object_left_hand"):
             angle = [0.522307,0.00879306,-1.39166, -0.517085, -1.82386, 1.57468, -0.00880191, 1.56713, 0.00879627, 0.230141]
-        elif(name == "carry_right_arm_1"):
+        elif(name == "small_object_left_hand"):
             angle = [1.56708, 0.00874494, -1.5748, -0.00874093, -0.223482, 0.529978, -0.00872931, 1.3994, 0.531267, 1.81723]
 
         setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
@@ -147,11 +147,11 @@ class ManipulationPytoolkit:
             try:
                 action_1 = setAction_1(joints_hip , angle_1, 0.2)
                 rospy.sleep(2)
-                action_2 = setAction_2(joints_arms, angle_2, 0.1)
+                action_2 = setAction_2(joints_arms_hands, angle_2, 0.1)
                 rospy.sleep(2)
-                action_3 = setAction_3(joints_arms, angles_3, 0.25)
+                action_3 = setAction_3(joints_arms_hands, angles_3, 0.25)
                 rospy.sleep(0.5)
-                action_4 = setAction_4(joints_arms, angles_3, 0.15)
+                action_4 = setAction_4(joints_arms_hands, angles_3, 0.15)
                 rospy.sleep(2)
                 return "place both arms executed"
 
