@@ -109,7 +109,7 @@ class ManipulationPytoolkit:
 
         setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
         try:
-            res = setAngles(joint_right_hand , angle, 0.1)
+            res = setAngles(joint_hands , angle, 0.1)
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
 
