@@ -99,11 +99,11 @@ class ManipulationPytoolkit:
     ###################################################### Go to action ######################################################
 
     def goToActionPytoolkit(self, name):
-        float64[] angle
-        string[] joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "HipPitch", "HipPitch"]
-        string[] joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "HipPitch", "HipPitch", "LHand", "RHand"]
-        string[] joints_hip = ["HipPitch"]
-        string[] joint_hands = ["LHand", "RHand"]
+        angle = []
+        joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "HipPitch", "HipPitch"]
+        joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "HipPitch", "HipPitch", "LHand", "RHand"]
+        joints_hip = ["HipPitch"]
+        joint_hands = ["LHand", "RHand"]
 
         if(name=="place_both_arms"):
             # Se agacha
