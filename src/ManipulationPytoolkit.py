@@ -259,3 +259,13 @@ class ManipulationPytoolkit:
         #Args: name of the position
         res = self.graspObjectPytoolkit(req.object)
         return res
+
+if __name__ == '__main__':
+    consoleFormatter=ConsoleFormatter.ConsoleFormatter()
+    manipulationPytoolkit = ManipulationPytoolkit()
+    try:
+        print(consoleFormatter.format(" --- manipulation utilities node successfully initialized ---","OKGREEN"))
+        rospy.spin()
+
+    except rospy.ROSInterruptException:
+        pass
