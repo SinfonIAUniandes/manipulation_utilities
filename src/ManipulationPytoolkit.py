@@ -136,7 +136,7 @@ class ManipulationPytoolkit:
             except rospy.ServiceException as exc:
                 print("Service did not process request: " + str(exc))
         
-        if(name=="place_left_arm"):
+        elif(name=="place_left_arm"):
             # Giras brazo
             angle_1 = [0.00383162, 1562, -0.00378999, -0.00877543, -4.09046e-05, -9.91789e-05, -1562, -9.95662e-05, 0.00881285, 7.63354e-05, 1.0, 0.5]
             setAction_1 = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)
@@ -175,7 +175,7 @@ class ManipulationPytoolkit:
                 action_6 = setAction_6(joints_arms , angle_6, 0.2)
                 return "place left arm executed"
 
-        if(name=="place_right_arm"):
+        elif(name=="place_right_arm"):
             # Giras brazo
             angle_1 = [1.56705, 0.0087755, -1.57479, -0.00876018, -0.00327626, 0.529962, -0.00886489, 1.39943, 0.531231, -1397, 0.5, 1.0]
             setAction_1 = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)
