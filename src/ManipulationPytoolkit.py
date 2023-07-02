@@ -4,10 +4,10 @@ from std_msgs.msg import String
 import ConsoleFormatter
 
 # Manipulation msgs
-from manipulation_msgs.srv import GoToState, GoToAction, GraspObject
+from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GraspObject
 
 # Pytoolkit msgs
-from manipulation_msgs.srv import set_angle_srv
+from manipulation_msgs_pytoolkit.srv import set_angle_srv
 
 class ManipulationPytoolkit:
     def __init__(self):
@@ -83,7 +83,17 @@ class ManipulationPytoolkit:
         elif(name == "close_left_hand"):
             angle = [0.0]
         
+        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
+        try:
+            res = setAngles(joint_left_hand , angle, 0.1)
+        except rospy.ServiceException as exc:
+            print("Service did not process request: " + str(exc))
+        
         # Right Hand
+        if(name == "open_left_hand"):
+            angle = [1.0]
+        elif(name == "close_left_hand"):
+            angle = [0.0]
 
         setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
         try:
