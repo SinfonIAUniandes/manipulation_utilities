@@ -43,7 +43,7 @@ class ManipulationPytoolkit:
         joint_hands = ["LHand", "RHand"]
 
         # Name joints
-        if name == "box" or name == "cylinder" or "tray" or "medium_object" or "bowl" or "small_object_left_hand" or "small_object_right_hand":
+        if name == "box" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "small_object_left_hand" or name == "small_object_right_hand":
             request.name = joints_arms
         elif name == "up_head" or name == "up_down" or name == "default_head":
             request.name =  joints_head
