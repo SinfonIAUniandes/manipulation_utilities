@@ -7,7 +7,7 @@ import ConsoleFormatter
 from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GraspObject
 
 # Pytoolkit msgs
-from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest
+from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest, set_angle_srvrequest
 
 class ManipulationPytoolkit:
     def __init__(self):
@@ -27,20 +27,32 @@ class ManipulationPytoolkit:
         print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
-        self.motionSetAngleServer = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
+        self.motionSetAngleClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
         print(consoleFormatter.format('motionSetAngleServer connected!', 'OKGREEN'))  
-        rospy.spin()
 
     ###################################################### Go to state ######################################################
-    
-    def goToStatePytoolkit(self, name):
+
+    def callbackGoToStatePytoolkit(self,req):
+        request = set_angle_srvRequest()
+        name = req.name
         angle = []
         joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         joints_head = ["HeadPitch", "HeadYaw"]
         joint_left_hand = ["LHand"]
         joint_right_hand = ["RHand"]
         joint_hands = ["LHand", "RHand"]
-        
+
+        if name == "box" or name == "cylinder" or "tray" or "medium_object" or "bowl" or "small_object_left_hand" or "small_object_right_hand":
+            request.name = joints_arms
+        elif name == "up_head" or name == "up_down" or name == "default_head":
+            request.name =  joints_head
+        elif name == "open_left_hand" or name == "open_left_hand" 
+            request.name = joint_left_hand
+        elif name == "open_right_hand" or name == "open_right_hand"   
+            request.name = joint_right_hand 
+        elif name == "open_both_hands" or name == "close_both_hands"  
+            request.name = joint_hands
+
         # Arms
         if(name=="box"):
             angle = [-0.00380663, 0.349535, 0.00386407, -0.51711, -1.82379, -0.00378216, -0.352371, 0.00378624, 0.00378624, 1.82381]
@@ -57,55 +69,25 @@ class ManipulationPytoolkit:
         elif(name == "small_object_right_hand"):
             angle = [1.56708, 0.00874494, -1.5748, -0.00874093, -0.223482, 0.529978, -0.00872931, 1.3994, 0.531267, 1.81723]
 
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            req=set_angle_srvRequest()
-            req.name = joints_arms
-            print(len(joints_arms))
-            req.angle = angle
-            print(len(angle))
-            req.speed = 0.1
-            res = setAngles.call(req)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-
         # Head
-        if(name == "up_head"):
+        elif(name == "up_head"):
             angle = [-0.4, 0.0]
         elif(name == "down_head"):
             angle = [0.46, 0.0]
         elif(name == "default_head"):
             angle = [0.0, 0.0]
 
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            res = setAngles(joints_head , angle, 0.1)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-
         # Left Hand
-        if(name == "open_left_hand"):
+        elif(name == "open_left_hand"):
             angle = [1.0]
         elif(name == "close_left_hand"):
             angle = [0.0]
         
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            res = setAngles(joint_left_hand , angle, 0.1)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-        
         # Right Hand
-        if(name == "open_right_hand"):
+        elif(name == "open_right_hand"):
             angle = [1.0]
         elif(name == "close_right_hand"):
             angle = [0.0]
-
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            res = setAngles(joint_right_hand , angle, 0.1)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
 
         # Open/Close hand 
         if(name == "open_both_hands"):
@@ -113,16 +95,12 @@ class ManipulationPytoolkit:
         elif(name == "close_both_hands"):
             angle = [0.0, 0.0]
 
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
         try:
-            res = setAngles(joint_hands , angle, 0.1)
+            request.angle = angle
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
-
-    def callbackGoToStatePytoolkit(self,req):
-        #Args: name of the position
-        res = self.goToStatePytoolkit(req.name)
-        return res
 
     ###################################################### Go to action ######################################################
 
