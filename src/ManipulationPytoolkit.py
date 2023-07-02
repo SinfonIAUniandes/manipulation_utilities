@@ -131,7 +131,7 @@ class ManipulationPytoolkit:
                 rospy.sleep(0.5)
                 action_4 = setAction_4(joints_arms, angles_3, 0.15)
                 rospy.sleep(2)
-                return "place both arms executed"
+                    return "place both arms executed"
 
             except rospy.ServiceException as exc:
                 print("Service did not process request: " + str(exc))
@@ -173,7 +173,7 @@ class ManipulationPytoolkit:
                 action_5 = setAction_2(joints_arms , angle_5, 0.2)
                 rospy.sleep(1.5)
                 action_6 = setAction_6(joints_arms , angle_6, 0.2)
-                return "place left arm executed"
+                    return "place left arm executed"
 
         if(name=="place_right_arm"):
             # Giras brazo
@@ -212,7 +212,7 @@ class ManipulationPytoolkit:
                 action_5 = setAction_5(joints_arms , angle_5, 0.2)
                 rospy.sleep(1.5)
                 action_6 = setAction_6(joints_arms , angle_6, 0.2)
-                return "place right arm executed"
+                    return "place right arm executed"
 
             except rospy.ServiceException as exc:
                 print("Service did not process request: " + str(exc))
