@@ -237,7 +237,7 @@ class ManipulationPytoolkit:
             except rospy.ServiceException as exc:
                 print("Service did not process request: " + str(exc))
         
-        else if(object in list_hold_both_arms_3):
+        elif(object in list_hold_both_arms_3):
             hold_both_arms_3 = rospy.ServiceProxy('pytoolkit/ALMotion/goToStatePytoolkit', GoToStatePytoolkit)
             try:
                 object = hold_both_arms_3("hold_both_arms_3")
