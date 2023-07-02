@@ -54,6 +54,8 @@ class ManipulationPytoolkit:
         elif name == "open_both_hands" or name == "close_both_hands":  
             request.name = joint_hands
 
+        print(request.name)
+
         # Arms
         elif(name=="box"):
             angle = [-0.00380663, 0.349535, 0.00386407, -0.51711, -1.82379, -0.00378216, -0.352371, 0.00378624, 0.00378624, 1.82381]
@@ -95,6 +97,8 @@ class ManipulationPytoolkit:
             angle = [1.0, 1.0]
         elif(name == "close_both_hands"):
             angle = [0.0, 0.0]
+
+        print(request.angle)
 
         try:
             request.angle = angle
