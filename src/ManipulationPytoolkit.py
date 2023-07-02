@@ -99,6 +99,7 @@ class ManipulationPytoolkit:
             request.angle = angle
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
+            return res.result
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
 
