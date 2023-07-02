@@ -35,7 +35,7 @@ class ManipulationPytoolkit:
     
     def goToStatePytoolkit(self, name):
         angle = []
-        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw"]
+        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         joints_head = ["HeadPitch", "HeadYaw"]
         joint_left_hand = ["LHand"]
         joint_right_hand = ["RHand"]
@@ -122,8 +122,8 @@ class ManipulationPytoolkit:
 
     def goToActionPytoolkit(self, name):
         angle = []
-        joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "LHand", "RHand"]
-        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw"]
+        joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw", "LHand", "RHand"]
+        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         joints_hip = ["HipPitch"]
         joint_hands = ["LHand", "RHand"]
 
