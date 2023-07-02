@@ -124,6 +124,7 @@ class ManipulationPytoolkit:
         angle = []
         joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "HipPitch", "HipPitch"]
         joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "HipPitch", "HipPitch", "LHand", "RHand"]
+        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw", "HipPitch", "HipPitch"]
         joints_hip = ["HipPitch"]
         joint_hands = ["LHand", "RHand"]
 
@@ -206,7 +207,7 @@ class ManipulationPytoolkit:
             setAction_1 = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)
 
             # Bajas brazo
-            angle_2 = [1.5747, 0.00874223, -1.57477, -0.00876009, -0.00328602, 0.781676, -0.00882641, 1.39931, 0.531273, -1.39709]
+            angle_2 = [1.5747, 0.00874223, -1.57477, -0.00876009, -0.00328602, 0.781676, -0.00882641, 1.39931, 0.531273, -1.39709, 0.5, 1.0]
             setAction_2 = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)
             
             # Abrir mano
