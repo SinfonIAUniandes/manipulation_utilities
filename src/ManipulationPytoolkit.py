@@ -42,19 +42,20 @@ class ManipulationPytoolkit:
         joint_right_hand = ["RHand"]
         joint_hands = ["LHand", "RHand"]
 
+        # Name joints
         if name == "box" or name == "cylinder" or "tray" or "medium_object" or "bowl" or "small_object_left_hand" or "small_object_right_hand":
             request.name = joints_arms
         elif name == "up_head" or name == "up_down" or name == "default_head":
             request.name =  joints_head
-        elif name == "open_left_hand" or name == "open_left_hand" 
+        elif name == "open_left_hand" or name == "open_left_hand":
             request.name = joint_left_hand
-        elif name == "open_right_hand" or name == "open_right_hand"   
+        elif name == "open_right_hand" or name == "open_right_hand":   
             request.name = joint_right_hand 
-        elif name == "open_both_hands" or name == "close_both_hands"  
+        elif name == "open_both_hands" or name == "close_both_hands":  
             request.name = joint_hands
 
         # Arms
-        if(name=="box"):
+        elif(name=="box"):
             angle = [-0.00380663, 0.349535, 0.00386407, -0.51711, -1.82379, -0.00378216, -0.352371, 0.00378624, 0.00378624, 1.82381]
         elif(name == "cylinder"):
             angle = [-0.00375922, 0.176294, 0.00380024, -0.86908, -1.82386, -0.00389758, -0.167802, -0.0038681, 0.87481, 1.82387]
