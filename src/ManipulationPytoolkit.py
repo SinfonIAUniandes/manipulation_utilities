@@ -149,9 +149,9 @@ class ManipulationPytoolkit:
                 rospy.sleep(2)
                 action_2 = setAction_2(joints_arms_hands, angle_2, 0.1)
                 rospy.sleep(2)
-                action_3 = setAction_3(joints_arms_hands, angles_3, 0.25)
+                action_3 = setAction_3(joints_arms_hands, angle_3, 0.25)
                 rospy.sleep(0.5)
-                action_4 = setAction_4(joints_arms_hands, angles_4, 0.15)
+                action_4 = setAction_4(joints_arms_hands, angle_4, 0.15)
                 rospy.sleep(2)
                 return "place both arms executed"
 
