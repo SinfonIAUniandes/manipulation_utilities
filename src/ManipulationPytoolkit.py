@@ -183,6 +183,9 @@ class ManipulationPytoolkit:
                 rospy.sleep(1.5)
                 action_6 = setAction_6(joints_arms , angle_6, 0.2)
                 return "place left arm executed"
+            
+            except rospy.ServiceException as exc:
+                print("Service did not process request: " + str(exc))
 
         elif(name=="place_right_arm"):
             # Giras brazo
