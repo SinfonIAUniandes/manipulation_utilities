@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(manipulation_utilities)
+project(manipulation_utilities_pytoolkit)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -11,20 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
-  interactive_markers
-  moveit_core
-  moveit_ros_planning
-  moveit_ros_planning_interface
-  moveit_ros_perception
-  rviz_visual_tools
-  moveit_visual_tools
-  pluginlib
-  geometric_shapes
-  pcl_ros
-  pcl_conversions
-  rosbag
-  tf2_ros
-  tf2_eigen
   geometry_msgs
 )
 
@@ -83,11 +69,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
- generate_messages(
-   DEPENDENCIES
-   geometry_msgs
-   std_msgs  # Or other packages containing msgs
- )
+# generate_messages(
+#   DEPENDENCIES
+#   geometry_msgs
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
