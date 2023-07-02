@@ -66,58 +66,10 @@ class ManipulationPytoolkit:
             print(len(angle))
             req.speed = 0.1
             res = setAngles.call(req)
+            return res
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
 
-        # Head
-        if(name == "up_head"):
-            angle = [-0.4, 0.0]
-        elif(name == "down_head"):
-            angle = [0.46, 0.0]
-        elif(name == "default_head"):
-            angle = [0.0, 0.0]
-
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            res = setAngles(joints_head , angle, 0.1)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-
-        # Left Hand
-        if(name == "open_left_hand"):
-            angle = [1.0]
-        elif(name == "close_left_hand"):
-            angle = [0.0]
-        
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            res = setAngles(joint_left_hand , angle, 0.1)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-        
-        # Right Hand
-        if(name == "open_right_hand"):
-            angle = [1.0]
-        elif(name == "close_right_hand"):
-            angle = [0.0]
-
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            res = setAngles(joint_right_hand , angle, 0.1)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
-
-        # Open/Close hand 
-        if(name == "open_both_hands"):
-            angle = [1.0, 1.0]
-        elif(name == "close_both_hands"):
-            angle = [0.0, 0.0]
-
-        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
-        try:
-            res = setAngles(joint_hands , angle, 0.1)
-        except rospy.ServiceException as exc:
-            print("Service did not process request: " + str(exc))
 
     def callbackGoToStatePytoolkit(self,req):
         #Args: name of the position
