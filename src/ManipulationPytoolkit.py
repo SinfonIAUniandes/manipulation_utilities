@@ -11,7 +11,6 @@ from manipulation_msgs_pytoolkit.srv import set_angle_srv
 
 class ManipulationPytoolkit:
     def __init__(self):
-        super(PEPPERMANIPULATION,self).__init__()
 
         rospy.init_node('ManipulationPytoolkit', anonymous=True)
         
