@@ -34,7 +34,7 @@ class ManipulationPytoolkit:
 
     ###################################################### Go to state ######################################################
     
-    def goToStatePytoolkit(self, name): 0,1
+    def goToStatePytoolkit(self, name):
         float64[] angle
         string[] joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw"]
         string[] joints_head = ["HeadPitch", "HeadYaw"]
@@ -57,16 +57,28 @@ class ManipulationPytoolkit:
         elif(name == "carry_right_arm_1"):
             angle = [1.56708, 0.00874494, -1.5748, -0.00874093, -0.223482, 0.529978, -0.00872931, 1.3994, 0.531267, 1.81723]
 
+        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
+        try:
+            res = setAngles(joints_head , angle, 0.1)
+        except rospy.ServiceException as exc:
+            print("Service did not process request: " + str(exc))
+
         # Head
-        elif(name == "up_head"):
+        if(name == "up_head"):
             angle = [-0.4, 0.0]
         elif(name == "down_head"):
             angle = [0.46, 0.0]
         elif(name == "default_head"):
             angle = [0.0, 0.0]
 
+        setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
+        try:
+            res = setAngles(joints_hands , angle, 0.1)
+        except rospy.ServiceException as exc:
+            print("Service did not process request: " + str(exc))
+
         # Open/Close Hand
-        elif(name == "open_left_hand"):
+        if(name == "open_left_hand"):
             angle = [1.0]
         elif(name == "close_left_hand"):
             angle = [0.0]
