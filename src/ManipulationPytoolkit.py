@@ -7,7 +7,7 @@ import ConsoleFormatter
 from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GraspObject
 
 # Pytoolkit msgs
-from manipulation_msgs_pytoolkit.srv import set_angle_srv
+from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest
 
 class ManipulationPytoolkit:
     def __init__(self):
@@ -46,20 +46,26 @@ class ManipulationPytoolkit:
             angle = [-0.00380663, 0.349535, 0.00386407, -0.51711, -1.82379, -0.00378216, -0.352371, 0.00378624, 0.00378624, 1.82381]
         elif(name == "cylinder"):
             angle = [-0.00375922, 0.176294, 0.00380024, -0.86908, -1.82386, -0.00389758, -0.167802, -0.0038681, 0.87481, 1.82387]
-        elif(name == "hold_both_arms_1"):
+        elif(name == "tray"):
             angle = [0.00385635, 0.00875869, -0.529993, -0.176235, -1.82385, -0.00372891, -0.00874921, 0.522316, 0.182004, 1.82386]
-        elif(name == "hold_both_arms_2"):
+        elif(name == "medium_object"):
             angle = [0.430887, 0.00880139, -0.712923, -0.525612, -1.82379, 0.438531, -0.00874419, 0.697761, 0.531296, 1.82379]
-        elif(name == "hold_both_arms_3"):
+        elif(name == "bowl"):
             angle = [0.334408, 0.0352817, -0.707165, -0.863631, -1.84084, 0.342078, -0.0475533, 0.710233, 0.857495, 1.83769]
         elif(name == "small_object_left_hand"):
             angle = [0.522307,0.00879306,-1.39166, -0.517085, -1.82386, 1.57468, -0.00880191, 1.56713, 0.00879627, 0.230141]
-        elif(name == "small_object_left_hand"):
+        elif(name == "small_object_right_hand"):
             angle = [1.56708, 0.00874494, -1.5748, -0.00874093, -0.223482, 0.529978, -0.00872931, 1.3994, 0.531267, 1.81723]
 
         setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
         try:
-            res = setAngles(joints_arms , angle, 0.1)
+            req=set_angle_srvRequest()
+            req.name = joints_arms
+            print(len(joints_arms))
+            req.angle = angle
+            print(len(angle))
+            req.speed = 0.1
+            res = setAngles.call(req)
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
 
