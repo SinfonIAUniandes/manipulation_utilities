@@ -7,7 +7,7 @@ import ConsoleFormatter
 from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GraspObject
 
 # Pytoolkit msgs
-from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest, set_angle_srvrequest
+from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest
 
 class ManipulationPytoolkit:
     def __init__(self):
