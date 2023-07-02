@@ -35,11 +35,11 @@ class ManipulationPytoolkit:
     ###################################################### Go to state ######################################################
     
     def goToStatePytoolkit(self, name):
-        float64[] angle
-        string[] joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw"]
-        string[] joints_head = ["HeadPitch", "HeadYaw"]
-        string[] joint_left_hand = ["LHand"]
-        string[] joint_right_hand = ["RHand"]
+        angle = []
+        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw"]
+        joints_head = ["HeadPitch", "HeadYaw"]
+        joint_left_hand = ["LHand"]
+        joint_right_hand = ["RHand"]
         
         # Arms
         if(name=="between_both_arms_1"):
@@ -59,7 +59,7 @@ class ManipulationPytoolkit:
 
         setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
         try:
-            res = setAngles(joints_head , angle, 0.1)
+            res = setAngles(joints_arms , angle, 0.1)
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
 
