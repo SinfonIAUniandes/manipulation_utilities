@@ -1,9 +1,10 @@
+#!/usr/bin/env python3
 import rospy
 from std_msgs.msg import String
 import consoleFormatter
 
 # Manipulation msgs
-from manipulation_msgs.srv import GoToStatePytoolkit, GoToActionPytoolkit, GraspObjectPytoolkit
+from manipulation_msgs.srv import GoToState, GoToAction, GraspObject
 
 # Pytoolkit msgs
 from manipulation_msgs.srv import set_angle_srv
@@ -37,7 +38,8 @@ class ManipulationPytoolkit:
         float64[] angle
         string[] joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "REbowYaw", "RElbowRoll", "RWristYaw"]
         string[] joints_head = ["HeadPitch", "HeadYaw"]
-        string[] joints_hand = ["LHand", "RHand"]
+        string[] joint_left_hand = ["LHand"]
+        string[] joint_right_hand = ["RHand"]
         
         # Arms
         if(name=="between_both_arms_1"):
@@ -63,15 +65,17 @@ class ManipulationPytoolkit:
         elif(name == "default_head"):
             angle = [0.0, 0.0]
 
-        # Open Hand
-        elif(name == "open_hand"):
+        # Open/Close Hand
+        elif(name == "open_left_hand"):
             angle = [1.0]
-        elif(name == "close_hand"):
+        elif(name == "close_left_hand"):
             angle = [0.0]
+        elif(name == "open_right_hand"):
+            angle = [0.0, 0.0]
 
         setAngles = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
         try:
-            res = setAngles(joints_head , angle, 0.1)
+            res = setAngles(joints_hands , angle, 0.1)
         except rospy.ServiceException as exc:
             print("Service did not process request: " + str(exc))
 
@@ -91,7 +95,7 @@ class ManipulationPytoolkit:
 
         if(name=="place_both_arms"):
             # Se agacha
-            angle_1 = [-0.35]
+            angle_1 = [-0.3_5]
             setAction_1 = rospy.ServiceProxy('pytoolkit/ALMotion/set_angle_srv', set_angle_srv)  
 
             # Separa los brazos
