@@ -27,7 +27,7 @@ class ManipulationPytoolkit:
         print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for goToStatePytoolkit from pytoolkit!', 'WARNING'))  
-        self.setState = rospy.ServiceProxy("pytoolkit/ALMotion/goToStatePytoolkit", GoToState)
+        self.setState = rospy.ServiceProxy("manipulation_utilities/goToStatePytoolkit", GoToState)
         print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
@@ -277,13 +277,13 @@ class ManipulationPytoolkit:
             request.name = "small_object_left_hand"
             request.velocity = 0.1
             res = self.setState.call(request)
-            return "Pose executed"
+            return res.result
 
         elif(name_object in list_2):
             request.name = "bowl"
             request.velocity = 0.1
             res = self.setState.call(request)
-            return "Pose executed"
+            return res.result
         
         else:
             return "Error"
