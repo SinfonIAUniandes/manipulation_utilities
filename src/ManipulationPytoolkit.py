@@ -267,7 +267,7 @@ class ManipulationPytoolkit:
 
         list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk"]
         list_2 = ["bowl", "plate" ]
-        name_object = req.name 
+        name_object = req.object 
         
         if(name_object in list_1):
             request.name = "small_object_left_hand"
