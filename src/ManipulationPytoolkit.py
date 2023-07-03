@@ -26,7 +26,7 @@ class ManipulationPytoolkit:
         self.graspObject = rospy.Service("manipulation_utilities/graspObjectPytoolkit", GraspObject, self.callbackGraspObjectPytoolkit)
         print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
 
-        print(consoleFormatter.format('waiting for goToStatePytoolkit from pytoolkit!', 'WARNING'))  
+        print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
         self.setState = rospy.ServiceProxy("manipulation_utilities/goToStatePytoolkit", GoToState)
         print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))  
 
