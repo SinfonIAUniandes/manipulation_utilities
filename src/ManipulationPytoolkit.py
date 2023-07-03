@@ -275,11 +275,13 @@ class ManipulationPytoolkit:
         
         if(name_object in list_1):
             request.name = "small_object_left_hand"
+            request.velocity = 0.1
             res = self.setState.call(request)
             return "Pose executed"
 
         elif(name_object in list_2):
             request.name = "bowl"
+            request.velocity = 0.1
             res = self.setState.call(request)
             return "Pose executed"
         
