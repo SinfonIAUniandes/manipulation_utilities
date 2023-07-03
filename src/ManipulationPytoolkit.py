@@ -4,7 +4,7 @@ from std_msgs.msg import String
 import ConsoleFormatter
 
 # Manipulation msgs
-from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GraspObject
+from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GoToStateRequest, GraspObject
 
 # Pytoolkit msgs
 from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest
