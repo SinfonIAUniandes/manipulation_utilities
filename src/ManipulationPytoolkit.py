@@ -138,25 +138,24 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            request.name = joints_arms_hands
-
             request.name = joint_hands
             request.angle = angle_2
             request.speed = 0.2
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
+            request.name = joints_arms_hands
             request.angle = angle_3
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            request.angle = angle_3
+            request.angle = angle_4
             request.speed = 0.25
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(0.5)
 
-            request.angle = angle_4 
+            request.angle = angle_5
             request.speed = 0.15
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
