@@ -15,16 +15,20 @@ class ManipulationPytoolkit:
         rospy.init_node('ManipulationPytoolkit', anonymous=True)
         
         print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
-        self.setAngles = rospy.Service("manipulation_utilities/goToStatePytoolkit", GoToState, self.callbackGoToStatePytoolkit)
+        self.goToState= rospy.Service("manipulation_utilities/goToStatePytoolkit", GoToState, self.callbackGoToStatePytoolkit)
         print(consoleFormatter.format('goToStatePytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for goToActionPytoolkit service!', 'WARNING'))  
-        self.setAngles = rospy.Service("manipulation_utilities/goToActionPytoolkit", GoToAction, self.callbackGoToActionPytoolkit)
+        self.goToAction = rospy.Service("manipulation_utilities/goToActionPytoolkit", GoToAction, self.callbackGoToActionPytoolkit)
         print(consoleFormatter.format('goToActionPytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for graspObjectPytoolkit service!', 'WARNING'))  
-        self.setAngles = rospy.Service("manipulation_utilities/graspObjectPytoolkit", GraspObject, self.callbackGraspObjectPytoolkit)
+        self.graspObject = rospy.Service("manipulation_utilities/graspObjectPytoolkit", GraspObject, self.callbackGraspObjectPytoolkit)
         print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
+
+        print(consoleFormatter.format('waiting for goToStatePytoolkit from pytoolkit!', 'WARNING'))  
+        self.setState = rospy.ServiceProxy("pytoolkit/ALMotion/goToStatePytoolkit", GoToState)
+        print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
         self.motionSetAngleClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
@@ -271,12 +275,12 @@ class ManipulationPytoolkit:
         
         if(name_object in list_1):
             request.name = "small_object_left_hand"
-            res = self.motionSetAngleClient.call(request)
+            res = self.setState.call(request)
             return "Pose executed"
 
         elif(name_object in list_2):
             request.name = "bowl"
-            res = self.motionSetAngleClient.call(request)
+            res = self.setState.call(request)
             return "Pose executed"
         
         else:
