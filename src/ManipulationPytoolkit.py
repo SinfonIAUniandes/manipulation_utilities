@@ -267,7 +267,7 @@ class ManipulationPytoolkit:
     ###################################################### Grasp object ######################################################
 
     def callbackGraspObjectPytoolkit(self, req):
-        request = GoToActionRequest()
+        request = GoToStateRequest()
 
         list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk"]
         list_2 = ["bowl", "plate" ]
