@@ -278,6 +278,9 @@ class ManipulationPytoolkit:
             request.name = "bowl"
             res = self.motionSetAngleClient.call(request)
             return "Pose executed"
+        
+        else:
+            return "Error"
 
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
