@@ -219,9 +219,11 @@ class ManipulationPytoolkit:
             rospy.sleep(2)
 
             request.angle = angle_5
+            request.speed = 0.2
             res = self.motionSetAngleClient.call(request)
 
             request.angle = angle_6
+            request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(1.5)
 
@@ -272,7 +274,7 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
 
             request.angle = angle_6
-            request.speed = 0.2
+            request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(1.5)
             return "place right arm executed"
