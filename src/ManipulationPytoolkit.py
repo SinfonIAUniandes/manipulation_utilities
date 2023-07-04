@@ -56,11 +56,11 @@ class ManipulationPytoolkit:
             request.name = joints_left_arm
         elif  name == "small_object_right_hand":
             request.name = joints_right_arm
-        elif name == "up_head" or name == "up_down" or name == "default_head":
+        elif name == "up_head" or name == "down_head" or name == "default_head":
             request.name =  joints_head
-        elif name == "open_left_hand" or name == "open_left_hand":
+        elif name == "open_left_hand" or name == "close_left_hand":
             request.name = joint_left_hand
-        elif name == "open_right_hand" or name == "open_right_hand":   
+        elif name == "open_right_hand" or name == "close_right_hand":   
             request.name = joint_right_hand 
         elif name == "open_both_hands" or name == "close_both_hands":  
             request.name = joint_hands
