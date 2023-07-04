@@ -77,7 +77,7 @@ class ManipulationPytoolkit:
         elif(name == "medium_object"):
             angle = [0.430887, 0.00880139, -0.712923, -0.525612, -1.82379, 0.438531, -0.00874419, 0.697761, 0.531296, 1.82379]
         elif(name == "bowl"):
-            angle = [0.964685, 0.00882546, -0.707146, -0.863463, -1.82381, 0.979843, -0.00882264, 0.71024, 0.857474, 1.82382]
+            angle = [0.796985, 0.00881456, -0.707278, -0.863581, -1.82383, 0.789256, -0.00880797, 0.71025, 0.857399, 1.82379]
         elif(name == "small_object_left_hand"):
             angle = [0.522307,0.00879306,-1.39166, -0.517085, -1.82386]
         elif(name == "small_object_right_hand"):
@@ -127,7 +127,7 @@ class ManipulationPytoolkit:
 
         joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw", "LHand", "RHand"]
         joints_left_arm = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
-        joints_right_arm = ["RShoulderPitch", "R1ShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]    
+        joints_right_arm = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]    
         joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         joints_hip = ["HipPitch"]
         joint_hands = ["LHand", "RHand"]
