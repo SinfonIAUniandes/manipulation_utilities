@@ -15,19 +15,19 @@ class ManipulationPytoolkit:
         rospy.init_node('ManipulationPytoolkit', anonymous=True)
         
         print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
-        self.goToState= rospy.Service("manipulation_utilities/goToStatePytoolkit", GoToState, self.callbackGoToStatePytoolkit)
+        self.goToState= rospy.Service("manipulation_utilities/goToState", GoToState, self.callbackGoToStatePytoolkit)
         print(consoleFormatter.format('goToStatePytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for goToActionPytoolkit service!', 'WARNING'))  
-        self.goToAction = rospy.Service("manipulation_utilities/goToActionPytoolkit", GoToAction, self.callbackGoToActionPytoolkit)
+        self.goToAction = rospy.Service("manipulation_utilities/goToAction", GoToAction, self.callbackGoToActionPytoolkit)
         print(consoleFormatter.format('goToActionPytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for graspObjectPytoolkit service!', 'WARNING'))  
-        self.graspObject = rospy.Service("manipulation_utilities/graspObjectPytoolkit", GraspObject, self.callbackGraspObjectPytoolkit)
+        self.graspObject = rospy.Service("manipulation_utilities/graspObject", GraspObject, self.callbackGraspObjectPytoolkit)
         print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
-        self.setState = rospy.ServiceProxy("manipulation_utilities/goToStatePytoolkit", GoToState)
+        self.setState = rospy.ServiceProxy("manipulation_utilities/goToState", GoToState)
         print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
@@ -42,14 +42,20 @@ class ManipulationPytoolkit:
         velocity = req.velocity
         angle = []
         joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+        joints_left_arm = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+        joints_right_arm = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         joints_head = ["HeadPitch", "HeadYaw"]
         joint_left_hand = ["LHand"]
         joint_right_hand = ["RHand"]
         joint_hands = ["LHand", "RHand"]
 
         # Name joints
-        if name == "box" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "small_object_left_hand" or name == "small_object_right_hand":
+        if name == "box" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "bottle":
             request.name = joints_arms
+        elif name == "small_object_left_hand":
+            request.name = joints_left_arm
+        elif  name == "small_object_right_hand":
+            request.name = joints_right_arm
         elif name == "up_head" or name == "up_down" or name == "default_head":
             request.name =  joints_head
         elif name == "open_left_hand" or name == "open_left_hand":
@@ -73,9 +79,11 @@ class ManipulationPytoolkit:
         elif(name == "bowl"):
             angle = [0.334408, 0.0352817, -0.707165, -0.863631, -1.84084, 0.342078, -0.0475533, 0.710233, 0.857495, 1.83769]
         elif(name == "small_object_left_hand"):
-            angle = [0.522307,0.00879306,-1.39166, -0.517085, -1.82386, 1.57468, -0.00880191, 1.56713, 0.00879627, 0.230141]
+            angle = [0.522307,0.00879306,-1.39166, -0.517085, -1.82386]
         elif(name == "small_object_right_hand"):
-            angle = [1.56708, 0.00874494, -1.5748, -0.00874093, -0.223482, 0.529978, -0.00872931, 1.3994, 0.531267, 1.81723]
+            angle = [1.56708, 0.00874494, -1.5748, -0.00874093, -0.223482]
+        elif(name == "bottle"):
+            angle = [0.781723, 0.00873155, -0.690057, -0.871938, -1.82384, 0.324122, -0.00874611, 0.16388, 0.579455, 1.82377]
 
         # Head
         elif(name == "up_head"):
