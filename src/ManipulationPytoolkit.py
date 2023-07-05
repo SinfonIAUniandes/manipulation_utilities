@@ -8,7 +8,7 @@ from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionReq
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 
 # Pytoolkit msgs
-from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest
+from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest, set_stiffness_srv, set_stiffness_srvRequest
 
 class ManipulationPytoolkit:
     def __init__(self):
@@ -45,22 +45,8 @@ class ManipulationPytoolkit:
         self.motionSetStiffnessClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_stiffness_srv", set_stiffness_srv)
         print(consoleFormatter.format('set_stiffness_srv connected!', 'OKGREEN')) 
         
-        self.initialize()
     
-    def initialize(self)
 
-        # Off autonomous life 
-        req_states = SetBoolRequest()
-        req_states.data = False
-        res = self.motionSetStatesClient.call(req_states)
-        print(res)
-
-        # On Stiffness in robot
-        req_stiffness = set_stiffness_srv()
-        req_stiffness.names = ["LArm", "RArm", "LHand", "RHand"]
-        req_stiffness.stiffnesses = [0.6, 0.6, 0.8, 0.8]
-        res = self.motionSetStiffnessClient.call(req_stiffness)
-        print(res)
 
 
     ###################################################### Go to state ######################################################
