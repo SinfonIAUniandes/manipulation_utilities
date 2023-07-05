@@ -5,6 +5,7 @@ import ConsoleFormatter
 
 # Manipulation msgs
 from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GoToStateRequest, GraspObject
+from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 
 # Pytoolkit msgs
 from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest
@@ -33,6 +34,34 @@ class ManipulationPytoolkit:
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
         self.motionSetAngleClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
         print(consoleFormatter.format('motionSetAngleServer connected!', 'OKGREEN'))  
+
+        # Off autonomous life 
+        print(consoleFormatter.format('waiting for set_state_srv from pytoolkit!', 'WARNING'))  
+        self.motionSetStatesClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_state_srv", SetBool)
+        print(consoleFormatter.format('set_state_srv connected!', 'OKGREEN')) 
+
+        # On Stiffness in robot
+        print(consoleFormatter.format('waiting for set_stiffness_srv from pytoolkit!', 'WARNING'))  
+        self.motionSetStiffnessClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_stiffness_srv", set_stiffness_srv)
+        print(consoleFormatter.format('set_stiffness_srv connected!', 'OKGREEN')) 
+        
+        self.initialize()
+    
+    def initialize(self)
+
+        # Off autonomous life 
+        req_states = SetBoolRequest()
+        req_states.data = False
+        res = self.motionSetStatesClient.call(req_states)
+        print(res)
+
+        # On Stiffness in robot
+        req_stiffness = set_stiffness_srv()
+        req_stiffness.names = ["LArm", "RArm", "LHand", "RHand"]
+        req_stiffness.stiffnesses = [0.6, 0.6, 0.8, 0.8]
+        res = self.motionSetStiffnessClient.call(req_stiffness)
+        print(res)
+
 
     ###################################################### Go to state ######################################################
 
@@ -84,6 +113,8 @@ class ManipulationPytoolkit:
             angle = [0.529978, -0.00872931, 1.3994, 0.531267, 1.81723]
         elif(name == "bottle"):
             angle = [0.781723, 0.00873155, -0.690057, -0.871938, -1.82384, 0.324122, -0.00874611, 0.16388, 0.579455, 1.82377]
+        elif(name == "pringles"):
+            angle = [0.514665, 0.0484047, -0.781569, -0.721599, -1.82386, 0.507025, -0.0570473, 0.796853, 0.710169, 1.82379]
         elif(name == "standard"):
             angle = [1.56717, 0.00878502, -1.56704, -0.00877923, -9.88085e-06, 1.55183, -0.00874544, -0.00385945, 0.00877765, 1.82379]
 
@@ -278,9 +309,69 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(1.5)
             return "place right arm executed"
+
+        elif(name=="place_right_cereal"):
+            # Mueves brazo al centro:
+            angle_1 = [0.308818, -0.00875719, 0.0572599, 0.749959, 1.82381]
+
+            # Gira el brazo
+            angle_2 = [0.308771, -0.00874305, 0.0571826, 0.749852, -0.943542]
+
+            # Acomoda el brazo
+            angle_3 = [0.773944, -0.0371506, 1.54414, 0.690335, 0.0501061]
+
+            # Abre la mano
+            angle_4 = [1.0]
+
+            # Extender brazo
+            angle_5 = [0.781602, -1.56204, 1.57468, 0.00876204, -1.39709]
+
+            # Girar brazo
+            angle_6 = [1.56717, -1.56198, 1.57451, 0.00885734, -1.39706]
+
+            # Bajar brazo
+            angle_7 = [1.56711, -0.00879193, 2.08561, 0.00880696, -0.523587]
+
+            request.name = joints_right_arm
+            request.angle = angle_1
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(2)
+
+            request.angle = angle_2
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(2)
+
+            request.angle = angle_3
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(2)
+
+            request.name = joint_right_hand
+            request.angle = angle_4
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(2)
+
+            request.angle = angle_5
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(2)
+
+            equest.angle = angle_6
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(2)
+
+            equest.angle = angle_7
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(2)
+            return "place right cereal executed"
+
         else: 
             return "No action name recognized"
-
 
     ###################################################### Grasp object ######################################################
 
