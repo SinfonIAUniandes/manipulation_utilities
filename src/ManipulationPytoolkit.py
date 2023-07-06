@@ -8,7 +8,7 @@ from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionReq
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 
 # Pytoolkit msgs
-from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest, set_stiffness_srv, set_stiffness_srvRequest
+from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest, set_stiffnesses_srv, set_stiffnesses_srvRequest
 
 class ManipulationPytoolkit:
     def __init__(self):
@@ -37,17 +37,32 @@ class ManipulationPytoolkit:
 
         # Off autonomous life 
         print(consoleFormatter.format('waiting for set_state_srv from pytoolkit!', 'WARNING'))  
-        self.motionSetStatesClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_state_srv", SetBool)
+        self.motionSetStatesClient = rospy.ServiceProxy("pytoolkit/ALAutonomousLife/set_state_srv", SetBool)
         print(consoleFormatter.format('set_state_srv connected!', 'OKGREEN')) 
 
         # On Stiffness in robot
         print(consoleFormatter.format('waiting for set_stiffness_srv from pytoolkit!', 'WARNING'))  
-        self.motionSetStiffnessClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_stiffness_srv", set_stiffness_srv)
+        self.motionSetStiffnessesClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_stiffnesses_srv", set_stiffnesses_srv)
         print(consoleFormatter.format('set_stiffness_srv connected!', 'OKGREEN')) 
         
+        self.initialize()
     
+    def initialize(self):
 
+        # Off autonomous life 
+        req_states = SetBoolRequest()
+        req_states.data = False
+        res = self.motionSetStatesClient.call(req_states)
 
+        # On Stiffness in robot
+        req_stiffnesses = set_stiffnesses_srvRequest()
+        req_stiffnesses.names = "RHand"
+        req_stiffnesses.stiffnesses = 0.5
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "LHand"
+        req_stiffnesses.stiffnesses = 0.5
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
 
     ###################################################### Go to state ######################################################
 
@@ -65,7 +80,7 @@ class ManipulationPytoolkit:
         joint_hands = ["LHand", "RHand"]
 
         # Name joints
-        if name == "box" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "bottle" or name == "standard":
+        if name == "box" or name == "master" or name == "pringles" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "bottle" or name == "standard" or name == "tray_full":
             request.name = joints_arms
         elif name == "small_object_left_hand":
             request.name = joints_left_arm
@@ -73,11 +88,11 @@ class ManipulationPytoolkit:
             request.name = joints_right_arm
         elif name == "up_head" or name == "down_head" or name == "default_head":
             request.name =  joints_head
-        elif name == "open_left_hand" or name == "close_left_hand":
+        elif name == "open_left_hand" or name == "close_left_hand" or name == "almost_open_left_hand" or name == "almost_close_left_hand":
             request.name = joint_left_hand
-        elif name == "open_right_hand" or name == "close_right_hand":   
+        elif name == "open_right_hand" or name == "close_right_hand" or name == "almost_open_right_hand" or name == "almost_close_right_hand":
             request.name = joint_right_hand 
-        elif name == "open_both_hands" or name == "close_both_hands":  
+        elif name == "open_both_hands" or name == "close_both_hands" or name == "almost_open_both_hands" or name == "almost_close_both_hands":  
             request.name = joint_hands
         else: 
             return "State not found"
@@ -94,19 +109,23 @@ class ManipulationPytoolkit:
         elif(name == "bowl"):
             angle = [0.796985, 0.00881456, -0.707278, -0.863581, -1.82383, 0.789256, -0.00880797, 0.71025, 0.857399, 1.82379]
         elif(name == "small_object_left_hand"):
-            angle = [0.522307,0.00879306,-1.39166, -0.517085, -1.82386]
+            angle = [0.308759, 0.00893056, -1.39162, -0.193354, -1.82376]
         elif(name == "small_object_right_hand"):
-            angle = [0.529978, -0.00872931, 1.3994, 0.531267, 1.81723]
+            angle = [0.316376, -0.00879693, 1.3917, 0.190529, 1.82386]
         elif(name == "bottle"):
             angle = [0.781723, 0.00873155, -0.690057, -0.871938, -1.82384, 0.324122, -0.00874611, 0.16388, 0.579455, 1.82377]
         elif(name == "pringles"):
             angle = [0.514665, 0.0484047, -0.781569, -0.721599, -1.82386, 0.507025, -0.0570473, 0.796853, 0.710169, 1.82379]
         elif(name == "standard"):
             angle = [1.56717, 0.00878502, -1.56704, -0.00877923, -9.88085e-06, 1.55183, -0.00874544, -0.00385945, 0.00877765, 1.82379]
+        elif(name == "tray_full"):
+            angle = [1.04842, 0.0087904, -1.57465, -1.00254, -1.56368, 1.04853, -0.00881849, 1.57481, 0.999722, 1.56373]
+        elif(name == "master"):
+            angle = [0.865441, 0.00884603, -0.804491, -0.997038, -0.623608, 0.873268, -0.0088472, 0.796842, 0.994103, 0.616864]
 
         # Head
         elif(name == "up_head"):
-            angle = [-0.4, 0.0]
+            angle = [-0.45, 0.0]
         elif(name == "down_head"):
             angle = [0.46, 0.0]
         elif(name == "default_head"):
@@ -115,19 +134,31 @@ class ManipulationPytoolkit:
         # Left Hand
         elif(name == "open_left_hand"):
             angle = [1.0]
+        elif(name == "almost_open_left_hand"):
+            angle = [0.75]
         elif(name == "close_left_hand"):
             angle = [0.0]
-        
+        elif(name == "almost_close_left_hand"):
+            angle = [0.25]
+
         # Right Hand
         elif(name == "open_right_hand"):
             angle = [1.0]
+        elif(name == "almost_open_right_hand"):
+            angle = [0.75]
         elif(name == "close_right_hand"):
             angle = [0.0]
+        elif(name == "almost_close_right_hand"):
+            angle = [0.25]
 
         # Open/Close hand 
         if(name == "open_both_hands"):
             angle = [1.0, 1.0]
+        elif(name == "almost_open_both_hands"):
+            angle = [0.75, 0.75]
         elif(name == "close_both_hands"):
+            angle = [0.0, 0.0]
+        elif(name == "almost_close_both_hands"):
             angle = [0.0, 0.0]
 
         request.angle = angle
@@ -249,9 +280,6 @@ class ManipulationPytoolkit:
         elif(name=="place_right_arm"):
             # Giras brazo
             angle_1 = [0.529962, -0.00886489, 1.39943, 0.531231, -2.174]
-
-            # Bajas brazo
-            angle_2 = [0.781676, -0.00882641, 1.39931, 0.531273, -1.39709]
             
             # Abrir mano
             angle_3 = [1.0]
@@ -267,31 +295,32 @@ class ManipulationPytoolkit:
 
             request.name = joints_right_arm
             request.angle = angle_1
-            request.speed = 0.2
+            request.speed = 0.05
             res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
+            rospy.sleep(3)
 
             request.angle = angle_2
             res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
+            rospy.sleep(3)
 
             request.name = joint_right_hand
             request.angle = angle_3
             res = self.motionSetAngleClient.call(request)
-            rospy.sleep(1)
+            rospy.sleep(3)
 
             request.name = joints_right_arm
             request.angle = angle_4
-            request.speed = 0.1
+            request.speed = 0.05
             res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
+            rospy.sleep(3)
 
             request.angle = angle_5
-            request.speed = 0.2
+            request.speed = 0.05
             res = self.motionSetAngleClient.call(request)
+            rospy.sleep(3)
 
             request.angle = angle_6
-            request.speed = 0.1
+            request.speed = 0.05
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(1.5)
             return "place right arm executed"
@@ -301,7 +330,7 @@ class ManipulationPytoolkit:
             angle_1 = [0.308818, -0.00875719, 0.0572599, 0.749959, 1.82381]
 
             # Gira el brazo
-            angle_2 = [0.308771, -0.00874305, 0.0571826, 0.749852, -0.943542]
+            angle_2 = [0.308826, -0.00880896, 0.057205, 0.7499, -0.943542]
 
             # Acomoda el brazo
             angle_3 = [0.773944, -0.0371506, 1.54414, 0.690335, 0.0501061]
@@ -340,17 +369,18 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
+            request.name = joints_right_arm
             request.angle = angle_5
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            equest.angle = angle_6
+            request.angle = angle_6
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            equest.angle = angle_7
+            request.angle = angle_7
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
@@ -359,7 +389,7 @@ class ManipulationPytoolkit:
         else: 
             return "No action name recognized"
 
-    ###################################################### Grasp object ######################################################
+    ############################v########################## Grasp object ######################################################
 
     def callbackGraspObjectPytoolkit(self, req):
         request = GoToStateRequest()
