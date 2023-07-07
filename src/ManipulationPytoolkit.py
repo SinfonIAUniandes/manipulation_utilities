@@ -56,14 +56,47 @@ class ManipulationPytoolkit:
 
         # On Stiffness in robot
         req_stiffnesses = set_stiffnesses_srvRequest()
-        req_stiffnesses.names = "RHand"
+
+        req_stiffnesses.names = "LShoulderPitch"
         req_stiffnesses.stiffnesses = 1
         res = self.motionSetStiffnessesClient.call(req_stiffnesses)
 
-        req_stiffnesses.names = "LHand"
+        req_stiffnesses.names = "LShoulderRoll"
         req_stiffnesses.stiffnesses = 1
         res = self.motionSetStiffnessesClient.call(req_stiffnesses)
 
+        req_stiffnesses.names = "LElbowYaw"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "LElbowRoll"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "LWristYaw"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "RShoulderPitch"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "RShoulderRoll"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "RElbowYaw"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "RElbowRoll"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "RWristYaw"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+        
     ###################################################### Go to state ######################################################
 
     def callbackGoToStatePytoolkit(self,req):
