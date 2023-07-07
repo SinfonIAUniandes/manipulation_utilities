@@ -334,7 +334,14 @@ class ManipulationPytoolkit:
             jointsRequest.speed = 0.2
             self.motionSetAngleClient.call(jointsRequest)
             rospy.sleep(2.2)
-            #self.openCloseHand_srv.call("right", "open")
+
+            jointsRequest = set_angle_srvRequest()
+            jointsRequest.name = ["joint_right_hand"]
+            jointsRequest.angle = [1.0]
+            jointsRequest.speed = 0.1
+            self.motionSetAngleClient.call(jointsRequest)
+
+
             rospy.sleep(1.2)
             jointsRequest = set_angle_srvRequest()
             jointsRequest.name = ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw']
