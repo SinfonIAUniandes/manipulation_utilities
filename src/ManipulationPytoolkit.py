@@ -340,24 +340,25 @@ class ManipulationPytoolkit:
 
             request.name = joints_right_arm
             request.angle = angle_2
-            request.speed = 0.4
+            request.speed = 0.32
             res = self.motionSetAngleClient.call(request)
+            rospy.sleep(0.45)
 
             # Devuelve brazo a la pose inicial
             angle_3 = [0.101074, -0.0706477, 0.430851, 0.00882103, 1.79614]
 
             request.name = joints_right_arm
             request.angle = angle_3
-            request.speed = 0.4
+            request.speed = 0.32
             res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
+            rospy.sleep(0.45)
 
             # Mueve al lado derecho 
             angle_4 = [0.10472, -0.0523599, 1.39626, 0.191986, 1.81514]
 
             request.name = joints_right_arm
             request.angle = angle_4
-            request.speed = 0.1
+            request.speed = 0.08
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
             
