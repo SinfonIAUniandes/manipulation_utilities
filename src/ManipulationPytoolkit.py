@@ -336,7 +336,7 @@ class ManipulationPytoolkit:
             rospy.sleep(2.2)
 
             jointsRequest = set_angle_srvRequest()
-            jointsRequest.name = ["joint_right_hand"]
+            jointsRequest.name = ["RHand"]
             jointsRequest.angle = [1.0]
             jointsRequest.speed = 0.1
             self.motionSetAngleClient.call(jointsRequest)
