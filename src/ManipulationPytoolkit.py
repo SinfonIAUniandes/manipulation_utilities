@@ -326,26 +326,8 @@ class ManipulationPytoolkit:
             return "place right arm executed"
 
         elif(name=="place_right_cereal"):
-            # Mueves brazo al centro:
-            angle_1 = [0.308818, -0.00875719, 0.0572599, 0.749959, 1.82381]
-
-            # Gira el brazo
-            angle_2 = [0.308826, -0.00880896, 0.057205, 0.7499, -0.943542]
-
-            # Acomoda el brazo
-            angle_3 = [0.773944, -0.0371506, 1.54414, 0.690335, 0.0501061]
-
-            # Abre la mano
-            angle_4 = [1.0]
-
-            # Extender brazo
-            angle_5 = [0.781602, -1.56204, 1.57468, 0.00876204, -1.39709]
-
-            # Girar brazo
-            angle_6 = [1.56717, -1.56198, 1.57451, 0.00885734, -1.39706]
-
-            # Bajar brazo
-            angle_7 = [1.56711, -0.00879193, 2.08561, 0.00880696, -0.523587]
+            # Ajusta el brazo
+            angle_1 = [0.101243, -0.0705631, 1.39132, 0.199418, 1.79627]
 
             request.name = joints_right_arm
             request.angle = angle_1
@@ -353,37 +335,32 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
+            # brazo para la tableta rapido
+            angle_2 = [0.101191, -0.0706058, 0.430828, 1.56205, 1.79615]
+
+            request.name = joints_right_arm
             request.angle = angle_2
-            request.speed = 0.1
+            request.speed = 0.4
             res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
 
+            # Devuelve brazo a la pose inicial
+            angle_3 = [0.101074, -0.0706477, 0.430851, 0.00882103, 1.79614]
+
+            request.name = joints_right_arm
             request.angle = angle_3
-            request.speed = 0.1
+            request.speed = 0.4
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            request.name = joint_right_hand
+            # Mueve al lado derecho 
+            angle_4 = [0.10472, -0.0523599, 1.39626, 0.191986, 1.81514]
+
+            request.name = joints_right_arm
             request.angle = angle_4
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
-
-            request.name = joints_right_arm
-            request.angle = angle_5
-            request.speed = 0.1
-            res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
-
-            request.angle = angle_6
-            request.speed = 0.1
-            res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
-
-            request.angle = angle_7
-            request.speed = 0.1
-            res = self.motionSetAngleClient.call(request)
-            rospy.sleep(2)
+            
             return "place right cereal executed"
             
         elif(name == "request_help_both_arms"):
