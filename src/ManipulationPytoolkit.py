@@ -57,6 +57,14 @@ class ManipulationPytoolkit:
         # On Stiffness in robot
         req_stiffnesses = set_stiffnesses_srvRequest()
 
+        req_stiffnesses.names = "RHand"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
+        req_stiffnesses.names = "LHand"
+        req_stiffnesses.stiffnesses = 1
+        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
+
         req_stiffnesses.names = "LShoulderPitch"
         req_stiffnesses.stiffnesses = 1
         res = self.motionSetStiffnessesClient.call(req_stiffnesses)
@@ -417,6 +425,30 @@ class ManipulationPytoolkit:
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
+
+            return "request_help_both_arms"
+
+        elif(name == "spin_head"):
+            angle_1 = [-0.436332]
+            request.name = ["HeadYaw"]
+            request.angle = angle_1
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(1)
+
+            angle_2 = [0.436332]
+            request.name = ["HeadYaw"]
+            request.angle = angle_2
+            request.speed = 0.08
+            res = self.motionSetAngleClient.call(request)
+            rospy.sleep(3)
+
+            request_1 = GoToStateRequest()
+            request_1.name = "default_head"
+            request_1.velocity = 0.1
+            res = self.setState.call(request_1)
+
+            return "spin_head"
 
         else: 
             return "No action name recognized"
