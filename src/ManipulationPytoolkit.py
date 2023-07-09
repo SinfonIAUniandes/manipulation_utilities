@@ -458,8 +458,9 @@ class ManipulationPytoolkit:
     def callbackGraspObjectPytoolkit(self, req):
         request = GoToStateRequest()
 
-        list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk"]
+        list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna", "tomato_soup", "banana", "strawberry_jello", "canned_meat", "sugar"]
         list_2 = ["bowl", "plate" ]
+        list_3 = ["mustard"]
         name_object = req.object 
         
         if(name_object in list_1):
@@ -467,13 +468,19 @@ class ManipulationPytoolkit:
             request.velocity = 0.1
             res = self.setState.call(request)
             return res.result
-
+        
         elif(name_object in list_2):
             request.name = "bowl"
             request.velocity = 0.1
             res = self.setState.call(request)
             return res.result
         
+        elif(name_object in list_3):
+            request.name = "master"
+            request.velocity = 0.1
+            res = self.setState.call(request)
+            return res.result
+
         else:
             return "Error"
 
