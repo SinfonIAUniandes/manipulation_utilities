@@ -125,7 +125,7 @@ class ManipulationPytoolkit:
             request.name = joints_arms
         elif name == "small_object_left_hand":
             request.name = joints_left_arm
-        elif  name == "small_object_right_hand":
+        elif  name == "small_object_right_hand" or name == "point_there":
             request.name = joints_right_arm
         elif name == "up_head" or name == "down_head" or name == "default_head":
             request.name =  joints_head
@@ -167,6 +167,8 @@ class ManipulationPytoolkit:
             angle = [0.316383, 0.00873112, -0.690055, -0.786829, -1.82382, 0.308927, -0.00874898, 0.690114, 0.792578, 1.82378]
         elif(name == "bowl_pequeño2"):
             angle = [0.285927, 0.088337, -0.79688, -0.866391, -1.82384, 0.285973, -0.0939549, 0.789178, 0.886188, 1.82378]
+        elif(name == "point_there"):
+            angle = [0.139626, 0.0174533, -0.261799, 0.174533, 1.81514]
 
         # Head
         elif(name == "up_head"):
