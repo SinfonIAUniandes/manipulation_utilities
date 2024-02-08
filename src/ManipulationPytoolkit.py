@@ -4,7 +4,7 @@ from std_msgs.msg import String
 import ConsoleFormatter
 
 # Manipulation msgs
-from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GoToStateRequest, GraspObject, MoveHead
+from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GoToStateRequest, GraspObject
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 
 # Pytoolkit msgs
@@ -27,9 +27,9 @@ class ManipulationPytoolkit:
         self.graspObject = rospy.Service("manipulation_utilities/graspObject", GraspObject, self.callbackGraspObjectPytoolkit)
         print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
         
-        print(consoleFormatter.format('waiting for moveHead service!', 'WARNING'))  
-        self.moveHead = rospy.Service("manipulation_utilities/moveHead", MoveHead, self.callbackMoveHeadPytoolkit)
-        print(consoleFormatter.format('moveHeadPytoolkit on!', 'OKGREEN'))  
+        # print(consoleFormatter.format('waiting for moveHead service!', 'WARNING'))  
+        # self.moveHead = rospy.Service("manipulation_utilities/moveHead", MoveHead, self.callbackMoveHeadPytoolkit)
+        # print(consoleFormatter.format('moveHeadPytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
         self.setState = rospy.ServiceProxy("manipulation_utilities/goToState", GoToState)
@@ -125,7 +125,7 @@ class ManipulationPytoolkit:
         joint_hands = ["LHand", "RHand"]
 
         # Name joints
-        if name == "box" or name == "bowl_pequeño2" or name == "bowl_pequeño" or name == "master" or name == "pringles" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "bottle" or name == "standard" or name == "tray_full":
+        if name == "box" or name == "bowl_pequeño2" or name == "bowl_pequeño" or name == "master" or name == "pringles" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "bottle" or name == "standard" or name == "tray_full" or name == "basket":
             request.name = joints_arms
         elif name == "small_object_left_hand":
             request.name = joints_left_arm
@@ -174,7 +174,7 @@ class ManipulationPytoolkit:
         elif(name == "point_there"):
             angle = [0.139626, 0.0174533, -0.261799, 0.174533, 1.81514]
         elif(name == "basket"):
-            angle = [0.680678, 0.0174533, -1.20428, -0.628319, -1.81514, 0.785398, -0.0174533, 1.37881, 0.802851, 1.72788   ]
+            angle = [0.820305, 0.0174533, -1.309, -1.09956, -1.8326, 0.872665, -0.0174533, 1.32645, 1.25664, 1.43117]
 
         # Head
         elif(name == "up_head"):
@@ -492,14 +492,14 @@ class ManipulationPytoolkit:
         else:
             return "Error"
         
-    def callbackMoveHeadPytoolkit(self, req):
-        request = set_angle_srvRequest()
-        joints_head = ["HeadPitch", "HeadYaw"]
-        request.name = joints_head
-        request.angle = [req.angle1, req.angle2]
-        request.speed = 0.1
-        res = self.motionSetAn
-        return res.result
+    # def callbackMoveHeadPytoolkit(self, req):
+    #     request = set_angle_srvRequest()
+    #     joints_head = ["HeadPitch", "HeadYaw"]
+    #     request.name = joints_head
+    #     request.angle = [req.angle1, req.angle2]
+    #     request.speed = 0.1
+    #     res = self.motionSetAn
+    #     return res.result
         
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
