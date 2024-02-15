@@ -494,23 +494,29 @@ class ManipulationPytoolkit:
         
         
     ############################v########################## Move Head ######################################################
+    # Implemented by fai-aher (Alonso Hernandez)
         
     def callbackMoveHeadPytoolkit(self, req):
         request = set_angle_srvRequest()
         joints_head = ["HeadPitch", "HeadYaw"]
-        request.name = joints_head
         
         if ((req.angle1 < -36) or (req.angle1 > 12)):
             return "No es posible mover la cabeza (HeadPitch) a ese ángulo"
         
         else: 
-            req.angle1Rad = (req.angle1 * 3.1416) / (180)
-            req.angle2Rad = (req.angle2 * 3.1416) / (180)
+            angle1 = (req.angle1 * 3.1416) / (180)
+            angle2 = (req.angle2 * 3.1416) / (180)
             
-            request.angle = [req.angle1Rad, req.angle2Rad]
+            request.name = joints_head
+            request.angle = [angle1, angle2]
             request.speed = 0.1
-            res = self.motionSetAn
+            res = self.motionSetAngleClient.call(request)
             return res.result
+        
+    
+    ############################v########################## Open Hands ######################################################
+    
+    
     
         
 if __name__ == '__main__':
