@@ -1,0 +1,5 @@
+**Branches Description:**
+In the *manipulation_utilities_pytoolkit* repository, we maintain several branches to manage the development lifecycle and ensure a stable version of our toolkit is always available. Here's an overview of our main branches:
+
+1. *main:* This is the primary branch that hosts the stable and up-to-date version of the manipulation_utilities_pytoolkit. All changes in this branch are fully documented and have been thoroughly tested to ensure reliability and stability for production use. The main branch is the go-to source for the latest stable release.
+2. *dev:* The development branch, known as dev, serves as the active workspace for our development team. Here, new features, enhancements, and experimental functionalities are developed and integrated. While this branch is regularly updated with the latest developments, it's important to note that it may not always be as stable as the main branch. The dev branch offers a glimpse into the ongoing work and upcoming features but should be used with caution in critical applications.
