@@ -36,6 +36,8 @@ class ManipulationPytoolkit:
         self.joint_right_hand = ["RHand"]
         self.joint_hands = ["LHand", "RHand"]
         self.joints_hip = ["HipPitch"]
+        
+        self.speed = 0.1 # Default movement speed
                 
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
@@ -58,13 +60,10 @@ class ManipulationPytoolkit:
         
         # =============================== PYTOOLKIT SERVICES DECLARATION ========================================
         
-        print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
-        self.setState = rospy.ServiceProxy("manipulation_utilities/goToState", go_to_state)
-        print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
         self.motionSetAngleClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
-        print(consoleFormatter.format('motionSetAngleServer connected!', 'OKGREEN'))  
+        print(consoleFormatter.format('set_angle_srv connected!', 'OKGREEN'))  
 
         # Autonomous life 
         print(consoleFormatter.format('waiting for set_state_srv from pytoolkit!', 'WARNING'))  
@@ -113,6 +112,8 @@ class ManipulationPytoolkit:
             req_stiffnesses.stiffnesses = 1
             self.motionSetStiffnessesClient.call(req_stiffnesses)
         
+        print(consoleFormatter.format('Initialization Completed!', 'OKGREEN'))
+        
 ########################################  MANIPULATION SERVICES  ############################################
 
     # ================================== GO TO STATE ========================================
@@ -142,7 +143,6 @@ class ManipulationPytoolkit:
         # Joints categories
         request = set_angle_srvRequest()
         name = req.name
-        speed = req.speed       
         
         # Read pose angles from CSV file located in data
         poses_info = csv.DictReader(open('../data/objects_poses.csv', encoding="utf-8"),delimiter=",")
@@ -151,7 +151,7 @@ class ManipulationPytoolkit:
         request.name = poses_angles[name][-1]
 
         request.angle = angle
-        request.speed = speed
+        request.speed = req.speed
         res = self.motionSetAngleClient.call(request)
         return res.result
 
@@ -160,7 +160,6 @@ class ManipulationPytoolkit:
     def callback_go_to_action(self, req):
         request = set_angle_srvRequest()
         name = req.name
-        angle = []
 
         if(name=="place_both_arms"):
             # Bajar cadera
@@ -482,11 +481,11 @@ class ManipulationPytoolkit:
             # Sets up the request for the movement service
             request.name = joints_head
             request.angle = [angle1, angle2]
-            request.speed = 0.1
+            request.speed = self.speed
             
             # Calls the movement service and returns the result
             res = self.motionSetAngleClient.call(request)
-            return res.result    
+        return res.result    
     
 # =========================================================== MAIN ================================================================
         
