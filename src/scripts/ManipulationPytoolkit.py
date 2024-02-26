@@ -1,227 +1,158 @@
 #!/usr/bin/env python3
+
+# Standard library imports
+import csv
+
+# ROS and third-party imports
 import rospy
-from std_msgs.msg import String
+
+# Local application/library specific imports
 import ConsoleFormatter
 
-# Manipulation msgs
-from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GoToStateRequest, GraspObject, moveHead
-from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
-
-# Pytoolkit msgs
-from manipulation_msgs_pytoolkit.srv import set_angle_srv, set_angle_srvRequest, set_stiffnesses_srv, set_stiffnesses_srvRequest
+# ROS messages and services
+from manipulation_msgs_pytoolkit.srv import *
+from std_srvs.srv import SetBool, SetBoolRequest
 
 class ManipulationPytoolkit:
+    
+    # ===================================================== INIT ==================================================================
+
     def __init__(self):
 
         rospy.init_node('ManipulationPytoolkit', anonymous=True)
         
-        print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
-        self.goToState= rospy.Service("manipulation_utilities/goToState", GoToState, self.callbackGoToStatePytoolkit)
-        print(consoleFormatter.format('goToStatePytoolkit on!', 'OKGREEN'))  
-
-        print(consoleFormatter.format('waiting for goToActionPytoolkit service!', 'WARNING'))  
-        self.goToAction = rospy.Service("manipulation_utilities/goToAction", GoToAction, self.callbackGoToActionPytoolkit)
-        print(consoleFormatter.format('goToActionPytoolkit on!', 'OKGREEN'))  
-
-        print(consoleFormatter.format('waiting for graspObjectPytoolkit service!', 'WARNING'))  
-        self.graspObject = rospy.Service("manipulation_utilities/graspObject", GraspObject, self.callbackGraspObjectPytoolkit)
-        print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
+        # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
-        print(consoleFormatter.format('waiting for moveHead service!', 'WARNING'))  
-        self.moveHead = rospy.Service("manipulation_utilities/moveHead", moveHead, self.callbackMoveHeadPytoolkit)
-        print(consoleFormatter.format('moveHeadPytoolkit on!', 'OKGREEN'))  
+        print(consoleFormatter.format('waiting for go_to_State service!', 'WARNING'))
+        self.goToState= rospy.Service("manipulation_utilities/go_to_state", go_to_state, self.callback_go_to_state)
+        print(consoleFormatter.format('go_to_state on!', 'OKGREEN'))
 
+        print(consoleFormatter.format('waiting for go_to_action service!', 'WARNING'))  
+        self.goToAction = rospy.Service("manipulation_utilities/go_to_action", go_to_action, self.callback_go_to_action)
+        print(consoleFormatter.format('go_to_action on!', 'OKGREEN'))
+
+        print(consoleFormatter.format('waiting for grasp_object service!', 'WARNING'))
+        self.graspObject = rospy.Service("manipulation_utilities/grasp_object", grasp_object, self.callback_grasp_object)
+        print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))
+        
+        print(consoleFormatter.format('waiting for moveHead service!', 'WARNING'))
+        self.moveHead = rospy.Service("manipulation_utilities/move_head", move_head, self.callback_move_head)
+        print(consoleFormatter.format('moveHeadPytoolkit on!', 'OKGREEN'))
+
+        
+        # =============================== PYTOOLKIT SERVICES DECLARATION ========================================
+        
         print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
-        self.setState = rospy.ServiceProxy("manipulation_utilities/goToState", GoToState)
-        print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))  
+        self.setState = rospy.ServiceProxy("manipulation_utilities/goToState", go_to_state)
+        print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
         self.motionSetAngleClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
         print(consoleFormatter.format('motionSetAngleServer connected!', 'OKGREEN'))  
 
-        # Off autonomous life 
+        # Autonomous life 
         print(consoleFormatter.format('waiting for set_state_srv from pytoolkit!', 'WARNING'))  
         self.motionSetStatesClient = rospy.ServiceProxy("pytoolkit/ALAutonomousLife/set_state_srv", SetBool)
         print(consoleFormatter.format('set_state_srv connected!', 'OKGREEN')) 
 
-        # On Stiffness in robot
+        # Stiffness in pepper
         print(consoleFormatter.format('waiting for set_stiffness_srv from pytoolkit!', 'WARNING'))  
         self.motionSetStiffnessesClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_stiffnesses_srv", set_stiffnesses_srv)
         print(consoleFormatter.format('set_stiffness_srv connected!', 'OKGREEN')) 
         
         self.initialize()
+        
+    # =============================== INITIALIZE ========================================
     
     def initialize(self):
+        """
+        Initializes the pepper by turning off autonomous life features and enabling stiffness in its joints.
 
-        # Off autonomous life 
+        This function performs two main operations to prepare the pepper for tasks. First, it disables the pepper
+        autonomous life features to ensure it remains stationary and does not perform any autonomous actions during
+        the initialization process. Second, it enables stiffness in all specified joints of the pepper, particularly
+        in the arms, to prepare them for movement and interaction.
+
+        Attributes:
+            joints (list of str): A list of joint names for the pepper arms, including hands, shoulders, elbows,
+            and wrists. This list is used to specify which joints will have their stiffness settings adjusted.
+
+        Operations:
+            1. Disables the pepper autonomous life features to prevent it from performing any autonomous actions
+            during the initialization.
+            2. Iterates over the specified arm joints and enables maximum stiffness in each to prepare them for
+            controlled movements.
+        """
+
+        # Turn off autonomous life 
         req_states = SetBoolRequest()
         req_states.data = False
-        #res = self.motionSetStatesClient.call(req_states)
 
-        # On Stiffness in robot
+        # Prepare the request for setting joint stiffnesses
         req_stiffnesses = set_stiffnesses_srvRequest()
-
-        req_stiffnesses.names = "RHand"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "LHand"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "LShoulderPitch"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "LShoulderRoll"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "LElbowYaw"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "LElbowRoll"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "LWristYaw"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "RShoulderPitch"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "RShoulderRoll"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "RElbowYaw"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "RElbowRoll"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
-
-        req_stiffnesses.names = "RWristYaw"
-        req_stiffnesses.stiffnesses = 1
-        res = self.motionSetStiffnessesClient.call(req_stiffnesses)
         
-    ###################################################### Go to state ######################################################
+        # Define the list of arm joints to set stiffness for
+        self.joints = ["LHand", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
+                       "RHand","RShoulderPitch", "RShoulderRoll", "RElbowYaw","RElbowRoll", "RWristYaw"] 
 
-    def callbackGoToStatePytoolkit(self,req):
+        # Set maximum stiffness for each specified joint
+        for joint in self.joints: 
+            req_stiffnesses.names = joint
+            req_stiffnesses.stiffnesses = 1
+            self.motionSetStiffnessesClient.call(req_stiffnesses)
+        
+########################################  MANIPULATION SERVICES  ############################################
+
+    # ================================== GO TO STATE ========================================
+
+    def callback_go_to_state(self,req):
+        """
+        Executes a specific pose for the pepper based on the provided request.
+
+        This callback function receives a request containing the name of the desired pose or movement and the velocity
+        at which the movement should be performed. It retrieves the corresponding angles for the pose from a predefined
+        CSV file containing pose information. Then, it sets the pepper joints to these angles at the specified velocity.
+
+        Parameters:
+            req (RequestMessageType): A request object containing the following attributes:
+                - name (str): The name of the pose or movement to execute. This name should correspond to an entry
+                in the 'objects_poses.csv' file.
+                - velocity (float): The speed at which the joints should move to reach the specified angles.
+
+        Returns:
+            ResultType: The result of the service call to set the pepper joint angles. The specific type of this
+            result depends on the service definition used by `motionSetAngleClient`.
+
+        Raises:
+            Exception: If there's an error in reading the CSV file or if the requested pose is not found in the file.
+        """
+
+        # Joints categories
         request = set_angle_srvRequest()
         name = req.name
         velocity = req.velocity
-        angle = []
         joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         joints_left_arm = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
         joints_right_arm = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
         joints_head = ["HeadPitch", "HeadYaw"]
         joint_left_hand = ["LHand"]
         joint_right_hand = ["RHand"]
-        joint_hands = ["LHand", "RHand"]
-
-        # Name joints
-        if name == "box" or name == "bowl_pequeño2" or name == "bowl_pequeño" or name == "master" or name == "pringles" or name == "cylinder" or  name== "tray" or name == "medium_object" or name == "bowl" or name == "bottle" or name == "standard" or name == "tray_full" or name == "basket":
-            request.name = joints_arms
-        elif name == "small_object_left_hand":
-            request.name = joints_left_arm
-        elif  name == "small_object_right_hand" or name == "point_there":
-            request.name = joints_right_arm
-        elif name == "up_head" or name == "down_head" or name == "default_head":
-            request.name =  joints_head
-        elif name == "open_left_hand" or name == "close_left_hand" or name == "almost_open_left_hand" or name == "almost_close_left_hand":
-            request.name = joint_left_hand
-        elif name == "open_right_hand" or name == "close_right_hand" or name == "almost_open_right_hand" or name == "almost_close_right_hand":
-            request.name = joint_right_hand 
-        elif name == "open_both_hands" or name == "close_both_hands" or name == "almost_open_both_hands" or name == "almost_close_both_hands":  
-            request.name = joint_hands
-        else: 
-            return "State not found"
-
-        # Arms
-        if(name=="box"):
-            angle = [-0.00380663, 0.349535, 0.00386407, -0.51711, -1.82379, -0.00378216, -0.352371, 0.00378624, 0.528438, 1.82381]
-        elif(name == "cylinder"):
-            angle = [-0.00375922, 0.176294, 0.00380024, -0.86908, -1.82386, -0.00389758, -0.167802, -0.0038681, 0.87481, 1.82387]
-        elif(name == "tray"):
-            angle = [0.00385635, 0.00875869, -0.529993, -0.176235, -1.82385, -0.00372891, -0.00874921, 0.522316, 0.182004, 1.82386]
-        elif(name == "medium_object"):
-            angle = [0.430887, 0.00880139, -0.712923, -0.525612, -1.82379, 0.438531, -0.00874419, 0.697761, 0.531296, 1.82379]
-        elif(name == "bowl"):
-            angle = [0.796985, 0.00881456, -0.707278, -0.863581, -1.82383, 0.789256, -0.00880797, 0.71025, 0.857399, 1.82379]
-        elif(name == "small_object_left_hand"):
-            angle = [0.10472, -0.0523599, -1.39626, -0.191986, -1.81514]
-        elif(name == "small_object_right_hand"):
-            angle = [0.10472, -0.0523599, 1.39626, 0.191986, 1.81514]
-        elif(name == "bottle"):
-            angle = [0.781723, 0.00873155, -0.690057, -0.871938, -1.82384, 0.324122, -0.00874611, 0.16388, 0.579455, 1.82377]
-        elif(name == "pringles"):
-            angle = [0.514665, 0.0484047, -0.781569, -0.721599, -1.82386, 0.507025, -0.0570473, 0.796853, 0.710169, 1.82379]
-        elif(name == "standard"):
-            angle = [1.56717, 0.00878502, -1.56704, -0.00877923, -9.88085e-06, 1.55183, -0.00874544, -0.00385945, 0.00877765, 1.82379]
-        elif(name == "tray_full"):
-            angle = [1.04842, 0.0087904, -1.57465, -1.00254, -1.56368, 1.04853, -0.00881849, 1.57481, 0.999722, 1.56373]
-        elif(name == "master"):
-            angle = [0.865441, 0.00884603, -0.804491, -0.997038, -0.623608, 0.873268, -0.0088472, 0.796842, 0.994103, 0.616864]
-        elif(name == "bowl_pequeño"):
-            angle = [0.316383, 0.00873112, -0.690055, -0.786829, -1.82382, 0.308927, -0.00874898, 0.690114, 0.792578, 1.82378]
-        elif(name == "bowl_pequeño2"):
-            angle = [0.285927, 0.088337, -0.79688, -0.866391, -1.82384, 0.285973, -0.0939549, 0.789178, 0.886188, 1.82378]
-        elif(name == "point_there"):
-            angle = [0.139626, 0.0174533, -0.261799, 0.174533, 1.81514]
-        elif(name == "basket"):
-            angle = [0.820305, 0.0174533, -1.309, -1.09956, -1.8326, 0.872665, -0.0174533, 1.32645, 1.25664, 1.43117]
-
-        # Head
-        elif(name == "up_head"):
-            angle = [-0.45, 0.0]
-        elif(name == "down_head"):
-            angle = [0.46, 0.0]
-        elif(name == "default_head"):
-            angle = [0.0, 0.0]
-
-        # Left Hand
-        elif(name == "open_left_hand"):
-            angle = [1.0]
-        elif(name == "almost_open_left_hand"):
-            angle = [0.75]
-        elif(name == "close_left_hand"):
-            angle = [0.0]
-        elif(name == "almost_close_left_hand"):
-            angle = [0.25]
-
-        # Right Hand
-        elif(name == "open_right_hand"):
-            angle = [1.0]
-        elif(name == "almost_open_right_hand"):
-            angle = [0.75]
-        elif(name == "close_right_hand"):
-            angle = [0.0]
-        elif(name == "almost_close_right_hand"):
-            angle = [0.25]
-
-        # Open/Close hand 
-        if(name == "open_both_hands"):
-            angle = [1.0, 1.0]
-        elif(name == "almost_open_both_hands"):
-            angle = [0.75, 0.75]
-        elif(name == "close_both_hands"):
-            angle = [0.0, 0.0]
-        elif(name == "almost_close_both_hands"):
-            angle = [0.0, 0.0]
+        joint_hands = ["LHand", "RHand"]        
+        
+        # Read pose angles from CSV file located in data
+        poses_info = csv.DictReader(open('../data/objects_poses.csv', encoding="utf-8"),delimiter=",")
+        poses_angles = {key: [row[key].strip() for row in poses_info if row[key].strip()] for key in poses_info.fieldnames}
+        angle = poses_angles[name]
+        request.name = poses_angles[name][-1]
 
         request.angle = angle
         request.speed = velocity
         res = self.motionSetAngleClient.call(request)
         return res.result
 
-    ###################################################### Go to action ######################################################
+    # ================================== GO TO ACTION ========================================
 
-    def callbackGoToActionPytoolkit(self, req):
+    def callback_go_to_action(self, req):
         request = set_angle_srvRequest()
         name = req.name
         angle = []
@@ -461,16 +392,42 @@ class ManipulationPytoolkit:
         else: 
             return "No action name recognized"
 
-    ############################v########################## Grasp object ######################################################
+    # ================================== GO TO STATE ========================================
 
-    def callbackGraspObjectPytoolkit(self, req):
+    def callback_grasp_object(self, req):
+        """
+        Handles a grasping request for various objects by categorizing them and assigning a specific pre-defined state 
+        for the pepper to execute, based on the object type.
+
+        This callback function examines the requested object's name and categorizes the object into one of several lists.
+        Depending on the category, the pepper is instructed to transition to a specific state optimized for grasping that 
+        category of object. The function supports a variety of common household and kitchen items, each associated with 
+        different grasping strategies.
+
+        Parameters:
+            req (RequestMessageType): A request object that includes an 'object' attribute, which is a string representing 
+            the name of the object to be grasped.
+
+        Returns:
+            str or ResultType: The result of the service call to set the pepper state for grasping the object. If the object 
+            name is not recognized, it returns an error message as a string. 'ResultType' should be replaced with the actual 
+            type of the result provided by the 'setState' service call.
+
+        Supported Objects:
+            - List 1: Small and manageable objects like 'fork', 'spoon', 'knife', etc., are handled using the 'small_object_left_hand' state.
+            - List 2: Slightly larger but flat objects like 'bowl' and 'plate' are handled using the 'bowl' state.
+            - List 3: Specific items like 'mustard' are handled using a specialized 'master' state for unique cases.
+        """
         request = GoToStateRequest()
 
-        list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna", "tomato_soup", "banana", "strawberry_jello", "canned_meat", "sugar"]
+        # Predefined lists categorizing objects based on the appropriate grasping strategy
+        list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna",
+                  "tomato_soup", "banana", "strawberry_jello", "canned_meat", "sugar"]
         list_2 = ["bowl", "plate" ]
         list_3 = ["mustard"]
         name_object = req.object 
         
+        # Determine the grasping strategy based on the object category
         if(name_object in list_1):
             request.name = "small_object_left_hand"
             request.velocity = 0.1
@@ -493,38 +450,62 @@ class ManipulationPytoolkit:
             return "Error"
         
         
-    ############################v########################## Move Head ######################################################
-    # Implemented by fai-aher (Alonso Hernandez)
-        
-    def callbackMoveHeadPytoolkit(self, req):
+    # ==================================== MOVE HEAD =====================================
+    
+    def callback_move_head(self, req):
+        """
+        Handles the request to move the pepper head to the specified angles in the request.
+
+        This function is a callback used to move the pepper head to desired angles, specified
+        in degrees. It converts the angles to radians and sends them to a pepper movement service. The function
+        checks the angle limits for 'HeadPitch' to ensure the movement is possible.
+
+        Parameters:
+            req (RequestMessageType): A request object containing the desired angles for 'HeadPitch'
+            and 'HeadYaw'. 'angle1' corresponds to 'HeadPitch' and 'angle2' to 'HeadYaw'. The angles should be specified
+            in degrees.
+
+        Returns:
+            str or ResponseMessageType: If the angle for 'HeadPitch' is outside the allowed limits (-36 to 12 degrees),
+            it returns an error message as a string. If the angles are valid, it sends a request to the pepper
+            movement service and returns the result of that service call.
+
+        """
         request = set_angle_srvRequest()
         joints_head = ["HeadPitch", "HeadYaw"]
         
+        # Checks limits for the 'HeadPitch' angle
         if ((req.angle1 < -36) or (req.angle1 > 12)):
-            return "No es posible mover la cabeza (HeadPitch) a ese ángulo"
+            return "It is not possible to move the head (HeadPitch joint) to this angle."
         
         else: 
+            # Converts angles from degrees to radians
             angle1 = (req.angle1 * 3.1416) / (180)
             angle2 = (req.angle2 * 3.1416) / (180)
             
+            # Sets up the request for the movement service
             request.name = joints_head
             request.angle = [angle1, angle2]
             request.speed = 0.1
+            
+            # Calls the movement service and returns the result
             res = self.motionSetAngleClient.call(request)
-            return res.result
-        
+            return res.result    
     
-    ############################v########################## Open Hands ######################################################
-    
-    
-    
+# =========================================================== MAIN ================================================================
         
 if __name__ == '__main__':
+    # Initialize a ConsoleFormatter instance for formatting console output messages.
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
+    # Initialize the main class responsible for manipulation utilities in the context of this ROS node.
     manipulationPytoolkit = ManipulationPytoolkit()
     try:
+        # Print a formatted success message indicating the manipulation utilities node has been successfully initialized.
         print(consoleFormatter.format(" --- manipulation utilities node successfully initialized ---","OKGREEN"))
+        # Keep the node running until it's shut down, for example by a ROS shutdown signal like Ctrl+C in the terminal.
         rospy.spin()
 
     except rospy.ROSInterruptException:
+        # Handle the case where the ROS node is interrupted (e.g., by Ctrl+C or other shutdown commands).
+        # The pass statement is used here to gracefully exit the block without doing anything specific in response to the exception.
         pass
