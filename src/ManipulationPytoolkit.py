@@ -4,7 +4,7 @@ from std_msgs.msg import String
 import ConsoleFormatter
 
 # Manipulation msgs
-from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GoToStateRequest, GraspObject
+from manipulation_msgs_pytoolkit.srv import GoToState, GoToAction, GoToActionRequest, GoToStateRequest, GraspObject, moveHead
 from std_srvs.srv import SetBool, SetBoolRequest, SetBoolResponse
 
 # Pytoolkit msgs
@@ -27,9 +27,9 @@ class ManipulationPytoolkit:
         self.graspObject = rospy.Service("manipulation_utilities/graspObject", GraspObject, self.callbackGraspObjectPytoolkit)
         print(consoleFormatter.format('graspObjectPytoolkit on!', 'OKGREEN'))  
         
-        # print(consoleFormatter.format('waiting for moveHead service!', 'WARNING'))  
-        # self.moveHead = rospy.Service("manipulation_utilities/moveHead", MoveHead, self.callbackMoveHeadPytoolkit)
-        # print(consoleFormatter.format('moveHeadPytoolkit on!', 'OKGREEN'))  
+        print(consoleFormatter.format('waiting for moveHead service!', 'WARNING'))  
+        self.moveHead = rospy.Service("manipulation_utilities/moveHead", moveHead, self.callbackMoveHeadPytoolkit)
+        print(consoleFormatter.format('moveHeadPytoolkit on!', 'OKGREEN'))  
 
         print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
         self.setState = rospy.ServiceProxy("manipulation_utilities/goToState", GoToState)
@@ -492,14 +492,32 @@ class ManipulationPytoolkit:
         else:
             return "Error"
         
-    # def callbackMoveHeadPytoolkit(self, req):
-    #     request = set_angle_srvRequest()
-    #     joints_head = ["HeadPitch", "HeadYaw"]
-    #     request.name = joints_head
-    #     request.angle = [req.angle1, req.angle2]
-    #     request.speed = 0.1
-    #     res = self.motionSetAn
-    #     return res.result
+        
+    ############################v########################## Move Head ######################################################
+    # Implemented by fai-aher (Alonso Hernandez)
+        
+    def callbackMoveHeadPytoolkit(self, req):
+        request = set_angle_srvRequest()
+        joints_head = ["HeadPitch", "HeadYaw"]
+        
+        if ((req.angle1 < -36) or (req.angle1 > 12)):
+            return "No es posible mover la cabeza (HeadPitch) a ese ángulo"
+        
+        else: 
+            angle1 = (req.angle1 * 3.1416) / (180)
+            angle2 = (req.angle2 * 3.1416) / (180)
+            
+            request.name = joints_head
+            request.angle = [angle1, angle2]
+            request.speed = 0.1
+            res = self.motionSetAngleClient.call(request)
+            return res.result
+        
+    
+    ############################v########################## Open Hands ######################################################
+    
+    
+    
         
 if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
