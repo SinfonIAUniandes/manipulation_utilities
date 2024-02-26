@@ -5,6 +5,7 @@ import csv
 
 # ROS and third-party imports
 import rospy
+import rosservice
 
 # Local application/library specific imports
 import ConsoleFormatter
@@ -21,6 +22,24 @@ class ManipulationPytoolkit:
 
         rospy.init_node('ManipulationPytoolkit', anonymous=True)
         
+        # =====================================  JOTINS DECLARATION ================================================
+        
+        # Define the lists of global joints
+        self.joints = ["LHand", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
+                       "RHand","RShoulderPitch", "RShoulderRoll", "RElbowYaw","RElbowRoll", "RWristYaw",
+                       "HeadPitch", "HeadYaw"]
+        self.joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
+                            "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+        self.joints_left_arm = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
+        self.joints_right_arm = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
+        self.joints_head = ["HeadPitch", "HeadYaw"]
+        self.joint_left_hand = ["LHand"]
+        self.joint_right_hand = ["RHand"]
+        self.joint_hands = ["LHand", "RHand"]
+        self.joints_hip = ["HipPitch"]
+        
+        self.speed = 0.1 # Default movement speed
+                
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
         print(consoleFormatter.format('waiting for go_to_State service!', 'WARNING'))
@@ -42,13 +61,10 @@ class ManipulationPytoolkit:
         
         # =============================== PYTOOLKIT SERVICES DECLARATION ========================================
         
-        print(consoleFormatter.format('waiting for goToStatePytoolkit service!', 'WARNING'))  
-        self.setState = rospy.ServiceProxy("manipulation_utilities/goToState", go_to_state)
-        print(consoleFormatter.format('goToStatePytoolkit connected!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for set_angle_srv from pytoolkit!', 'WARNING'))  
         self.motionSetAngleClient = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
-        print(consoleFormatter.format('motionSetAngleServer connected!', 'OKGREEN'))  
+        print(consoleFormatter.format('set_angle_srv connected!', 'OKGREEN'))  
 
         # Autonomous life 
         print(consoleFormatter.format('waiting for set_state_srv from pytoolkit!', 'WARNING'))  
@@ -90,16 +106,14 @@ class ManipulationPytoolkit:
 
         # Prepare the request for setting joint stiffnesses
         req_stiffnesses = set_stiffnesses_srvRequest()
-        
-        # Define the list of arm joints to set stiffness for
-        self.joints = ["LHand", "LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw",
-                       "RHand","RShoulderPitch", "RShoulderRoll", "RElbowYaw","RElbowRoll", "RWristYaw"] 
 
         # Set maximum stiffness for each specified joint
         for joint in self.joints: 
             req_stiffnesses.names = joint
             req_stiffnesses.stiffnesses = 1
             self.motionSetStiffnessesClient.call(req_stiffnesses)
+        
+        print(consoleFormatter.format('Initialization Completed!', 'OKGREEN'))
         
 ########################################  MANIPULATION SERVICES  ############################################
 
@@ -109,15 +123,15 @@ class ManipulationPytoolkit:
         """
         Executes a specific pose for the pepper based on the provided request.
 
-        This callback function receives a request containing the name of the desired pose or movement and the velocity
+        This callback function receives a request containing the name of the desired pose or movement and the speed
         at which the movement should be performed. It retrieves the corresponding angles for the pose from a predefined
-        CSV file containing pose information. Then, it sets the pepper joints to these angles at the specified velocity.
+        CSV file containing pose information. Then, it sets the pepper joints to these angles at the specified speed.
 
         Parameters:
             req (RequestMessageType): A request object containing the following attributes:
                 - name (str): The name of the pose or movement to execute. This name should correspond to an entry
                 in the 'objects_poses.csv' file.
-                - velocity (float): The speed at which the joints should move to reach the specified angles.
+                - speed (float): The speed at which the joints should move to reach the specified angles.
 
         Returns:
             ResultType: The result of the service call to set the pepper joint angles. The specific type of this
@@ -130,14 +144,6 @@ class ManipulationPytoolkit:
         # Joints categories
         request = set_angle_srvRequest()
         name = req.name
-        velocity = req.velocity
-        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
-        joints_left_arm = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
-        joints_right_arm = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
-        joints_head = ["HeadPitch", "HeadYaw"]
-        joint_left_hand = ["LHand"]
-        joint_right_hand = ["RHand"]
-        joint_hands = ["LHand", "RHand"]        
         
         # Read pose angles from CSV file located in data
         poses_info = csv.DictReader(open('../data/objects_poses.csv', encoding="utf-8"),delimiter=",")
@@ -146,7 +152,7 @@ class ManipulationPytoolkit:
         request.name = poses_angles[name][-1]
 
         request.angle = angle
-        request.speed = velocity
+        request.speed = req.speed
         res = self.motionSetAngleClient.call(request)
         return res.result
 
@@ -155,16 +161,6 @@ class ManipulationPytoolkit:
     def callback_go_to_action(self, req):
         request = set_angle_srvRequest()
         name = req.name
-        angle = []
-
-        joints_arms_hands = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw", "LHand", "RHand"]
-        joints_left_arm = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw"]
-        joints_right_arm = ["RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]    
-        joints_arms = ["LShoulderPitch", "LShoulderRoll", "LElbowYaw", "LElbowRoll", "LWristYaw", "RShoulderPitch", "RShoulderRoll", "RElbowYaw", "RElbowRoll", "RWristYaw"]
-        joints_hip = ["HipPitch"]
-        joint_hands = ["LHand", "RHand"]
-        joint_left_hand = ["LHand"]
-        joint_right_hand = ["RHand"]
 
         if(name=="place_both_arms"):
             # Bajar cadera
@@ -185,19 +181,19 @@ class ManipulationPytoolkit:
             # Subir cadera
             angle_6 = [-0.1]
 
-            request.name = joints_hip
+            request.name = self.joints_hip
             request.angle = angle_1
             request.speed = 0.2
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            request.name = joint_hands
+            request.name = self.joint_hands
             request.angle = angle_2
             request.speed = 0.2
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            request.name = joints_arms_hands
+            request.name = self.joints_arms_hands
             request.angle = angle_3
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
@@ -213,7 +209,7 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            request.name = joints_hip
+            request.name = self.joints_hip
             request.angle = angle_6
             request.speed = 0.15
             res = self.motionSetAngleClient.call(request)
@@ -237,7 +233,7 @@ class ManipulationPytoolkit:
             # Bajar brazo
             angle_6 = [1.56708, 0.0230135, -1.39941, -0.00876288, -0.230052]
 
-            request.name = joints_left_arm
+            request.name = self.joints_left_arm
             request.angle = angle_1
             request.speed = 0.2
             res = self.motionSetAngleClient.call(request)
@@ -247,12 +243,12 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
 
-            request.name = joint_left_hand
+            request.name = self.joint_left_hand
             request.angle = angle_3
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(1)
 
-            request.name = joints_left_arm
+            request.name = self.joints_left_arm
             request.angle = angle_4
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(2)
@@ -316,7 +312,7 @@ class ManipulationPytoolkit:
             # Ajusta el brazo
             angle_1 = [0.101243, -0.0705631, 1.39132, 0.199418, 1.79627]
 
-            request.name = joints_right_arm
+            request.name = self.joints_right_arm
             request.angle = angle_1
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
@@ -325,7 +321,7 @@ class ManipulationPytoolkit:
             # brazo para la tableta rapido
             angle_2 = [0.101191, -0.0706058, 0.430828, 1.56205, 1.79615]
 
-            request.name = joints_right_arm
+            request.name = self.joints_right_arm
             request.angle = angle_2
             request.speed = 0.32
             res = self.motionSetAngleClient.call(request)
@@ -334,7 +330,7 @@ class ManipulationPytoolkit:
             # Devuelve brazo a la pose inicial
             angle_3 = [0.101074, -0.0706477, 0.430851, 0.00882103, 1.79614]
 
-            request.name = joints_right_arm
+            request.name = self.joints_right_arm
             request.angle = angle_3
             request.speed = 0.32
             res = self.motionSetAngleClient.call(request)
@@ -343,7 +339,7 @@ class ManipulationPytoolkit:
             # Mueve al lado derecho 
             angle_4 = [0.10472, -0.0523599, 1.39626, 0.191986, 1.81514]
 
-            request.name = joints_right_arm
+            request.name = self.joints_right_arm
             request.angle = angle_4
             request.speed = 0.08
             res = self.motionSetAngleClient.call(request)
@@ -353,7 +349,7 @@ class ManipulationPytoolkit:
             
         elif(name == "request_help_both_arms"):
             angle_1 = [0.285927, 0.088337, -0.79688, -0.866391, -1.82384, 0.285973, -0.0939549, 0.789178, 0.886188, 1.82378]
-            request.name = joints_arms
+            request.name = self.joints_arms
             request.angle = angle_1
             request.speed = 0.1
             res = self.motionSetAngleClient.call(request)
@@ -382,9 +378,9 @@ class ManipulationPytoolkit:
             res = self.motionSetAngleClient.call(request)
             rospy.sleep(3)
 
-            request_1 = GoToStateRequest()
+            request_1 = go_to_stateRequest()
             request_1.name = "default_head"
-            request_1.velocity = 0.1
+            request_1.speed = 0.1
             res = self.setState.call(request_1)
 
             return "spin_head"
@@ -418,7 +414,7 @@ class ManipulationPytoolkit:
             - List 2: Slightly larger but flat objects like 'bowl' and 'plate' are handled using the 'bowl' state.
             - List 3: Specific items like 'mustard' are handled using a specialized 'master' state for unique cases.
         """
-        request = GoToStateRequest()
+        request = go_to_stateRequest()
 
         # Predefined lists categorizing objects based on the appropriate grasping strategy
         list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna",
@@ -430,19 +426,19 @@ class ManipulationPytoolkit:
         # Determine the grasping strategy based on the object category
         if(name_object in list_1):
             request.name = "small_object_left_hand"
-            request.velocity = 0.1
+            request.speed = 0.1
             res = self.setState.call(request)
             return res.result
         
         elif(name_object in list_2):
             request.name = "bowl"
-            request.velocity = 0.1
+            request.speed = 0.1
             res = self.setState.call(request)
             return res.result
         
         elif(name_object in list_3):
             request.name = "master"
-            request.velocity = 0.1
+            request.speed = 0.1
             res = self.setState.call(request)
             return res.result
 
@@ -486,26 +482,31 @@ class ManipulationPytoolkit:
             # Sets up the request for the movement service
             request.name = joints_head
             request.angle = [angle1, angle2]
-            request.speed = 0.1
+            request.speed = self.speed
             
             # Calls the movement service and returns the result
             res = self.motionSetAngleClient.call(request)
-            return res.result    
+        return res.result    
     
 # =========================================================== MAIN ================================================================
         
 if __name__ == '__main__':
     # Initialize a ConsoleFormatter instance for formatting console output messages.
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
-    # Initialize the main class responsible for manipulation utilities in the context of this ROS node.
-    manipulationPytoolkit = ManipulationPytoolkit()
     try:
+        # Initialize the main class responsible for manipulation utilities in the context of this ROS node.
+        manipulationPytoolkit = ManipulationPytoolkit()
         # Print a formatted success message indicating the manipulation utilities node has been successfully initialized.
         print(consoleFormatter.format(" --- manipulation utilities node successfully initialized ---","OKGREEN"))
+        # Retrieve a list of available ROS services to ensure ROS functionalities are active and accessible.
+        available_services = rosservice.get_service_list()
         # Keep the node running until it's shut down, for example by a ROS shutdown signal like Ctrl+C in the terminal.
         rospy.spin()
 
     except rospy.ROSInterruptException:
-        # Handle the case where the ROS node is interrupted (e.g., by Ctrl+C or other shutdown commands).
-        # The pass statement is used here to gracefully exit the block without doing anything specific in response to the exception.
+        # Handle the interruption of the ROS node (e.g., Ctrl+C).
         pass
+    
+    except rospy.ROSException as e:
+        # Handle general ROS errors, including the unavailability of ROS.
+        print(consoleFormatter.format(f"ROS Error: {e}", "FAIL"))
