@@ -5,6 +5,7 @@ import csv
 
 # ROS and third-party imports
 import rospy
+import rosservice
 
 # Local application/library specific imports
 import ConsoleFormatter
@@ -492,15 +493,20 @@ class ManipulationPytoolkit:
 if __name__ == '__main__':
     # Initialize a ConsoleFormatter instance for formatting console output messages.
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
-    # Initialize the main class responsible for manipulation utilities in the context of this ROS node.
-    manipulationPytoolkit = ManipulationPytoolkit()
     try:
+        # Initialize the main class responsible for manipulation utilities in the context of this ROS node.
+        manipulationPytoolkit = ManipulationPytoolkit()
         # Print a formatted success message indicating the manipulation utilities node has been successfully initialized.
         print(consoleFormatter.format(" --- manipulation utilities node successfully initialized ---","OKGREEN"))
+        # Retrieve a list of available ROS services to ensure ROS functionalities are active and accessible.
+        available_services = rosservice.get_service_list()
         # Keep the node running until it's shut down, for example by a ROS shutdown signal like Ctrl+C in the terminal.
         rospy.spin()
 
     except rospy.ROSInterruptException:
-        # Handle the case where the ROS node is interrupted (e.g., by Ctrl+C or other shutdown commands).
-        # The pass statement is used here to gracefully exit the block without doing anything specific in response to the exception.
+        # Handle the interruption of the ROS node (e.g., Ctrl+C).
         pass
+    
+    except rospy.ROSException as e:
+        # Handle general ROS errors, including the unavailability of ROS.
+        print(consoleFormatter.format(f"ROS Error: {e}", "FAIL"))
