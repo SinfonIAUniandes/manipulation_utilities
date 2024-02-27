@@ -43,7 +43,7 @@ class ManipulationPytoolkit:
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
         print(consoleFormatter.format('waiting for go_to_State service!', 'WARNING'))
-        self.goToState= rospy.Service("manipulation_utilities/go_to_state", go_to_state, self.callback_go_to_state)
+        self.goToState= rospy.Service("manipulation_utilities/go_to_state", go_to_distate, self.callback_go_to_state)
         print(consoleFormatter.format('go_to_state on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for go_to_action service!', 'WARNING'))  
@@ -146,7 +146,7 @@ class ManipulationPytoolkit:
         name = req.name
         
         # Read pose angles from CSV file located in data
-        poses_info = csv.DictReader(open('../data/objects_poses.csv', encoding="utf-8"),delimiter=",")
+        poses_info = csv.DictReader(open('/data/objects_poses.csv', encoding="utf-8"),delimiter=",")
         poses_angles = {key: [row[key].strip() for row in poses_info if row[key].strip()] for key in poses_info.fieldnames}
         angle = poses_angles[name]
         request.name = poses_angles[name][-1]
