@@ -12,10 +12,11 @@ import ConsoleFormatter
 
 # ROS messages and services
 from std_srvs.srv import SetBool, SetBoolRequest
-from manipulation_msgs_pytoolkit.srv import go_to_position, play_action, grasp_object, move_head
-from robot_toolkit_msgs.srv import set_angle_srv, set_stiffnesses_srv
+from manipulation_msgs_pytoolkit.srv import set_stiffnesses_srv, set_angle_srv, go_to_pose, play_action, grasp_object
+from manipulation_utilities_pytoolkit import ManipulationPytoolkit
+from manipulation_msgs_pytoolkit import setStiffnessesSrvRequest, SetAngleSrvRequest, GoToPoseRequest, PlayActionRequest, GraspObjectRequest
 
-class ManipulationPyServices:
+class ManipulationPytoolkit:
     
     # ===================================================== INIT ==================================================================
 
@@ -44,7 +45,7 @@ class ManipulationPyServices:
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
         print(consoleFormatter.format('waiting for go_to_position service!', 'WARNING'))
-        self.go_to_position= rospy.Service("manipulation_utilities/go_to_position", go_to_position, self.callback_go_to_position)
+        self.go_to_position= rospy.Service("manipulation_utilities/go_to_position", go_to_pose, self.callback_go_to_pose)
         print(consoleFormatter.format('Service go_to_position from ManipulationPyServices is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for play_action service!', 'WARNING'))  
@@ -54,10 +55,19 @@ class ManipulationPyServices:
         print(consoleFormatter.format('waiting for grasp_object service!', 'WARNING'))
         self.grasp_object = rospy.Service("manipulation_utilities/grasp_object", grasp_object, self.callback_grasp_object)
         print(consoleFormatter.format('Service grasp_object from ManipulationPyServices is on!', 'OKGREEN'))
-
+        
+        
+        # ==================================  MOTION SERVICES DECLARATION ======================================== 
+        
         print(consoleFormatter.format('waiting for move_head service!', 'WARNING'))
         self.motion_set_angle_client = rospy.ServiceProxy("pytoolkit/ALMotion/set_angle_srv", set_angle_srv)
         print(consoleFormatter.format('set_angle_srv connected!', 'OKGREEN'))  
+        
+        # Autonomous life 
+        print(consoleFormatter.format('waiting for set_state_srv from pytoolkit!', 'WARNING'))  
+        self.motion_set_states_client = rospy.ServiceProxy("pytoolkit/ALAutonomousLife/set_state_srv", SetBool)
+        print(consoleFormatter.format('set_state_srv connected!', 'OKGREEN')) 
+
 
         # Stiffness in pepper
         print(consoleFormatter.format('waiting for set_stiffness_srv from pytoolkit!', 'WARNING'))  
@@ -93,7 +103,7 @@ class ManipulationPyServices:
         req_states.data = False
 
         # Prepare the request for setting joint stiffnesses
-        req_stiffnesses = set_stiffnesses_srvRequest()
+        req_stiffnesses = setStiffnessesSrvRequest()
 
         # Set maximum stiffness for each specified joint
         for joint in self.joints: 
@@ -105,9 +115,9 @@ class ManipulationPyServices:
         
 ########################################  MANIPULATION SERVICES  ############################################
 
-    # ================================== GO TO STATE ========================================
+    # ================================== GO TO POSITION ========================================
 
-    def callback_go_to_position(self, req):
+    def callback_go_to_pose(self, req):
         """
         Executes a specific pose for the pepper based on the provided request.
 
@@ -181,26 +191,22 @@ class ManipulationPyServices:
         
         # Position 1: Placing Pepper's both arms in the specified angles
         if(name=="place_both_arms"):
-            # Bajar cadera
+            # ===================================== Angles definition for each step ===============================================
+            # 1. Baja la cadera
             hips_lower_angle = [-0.39]
-
-            # Abre las manos
-            hands_angles = [1.0, 1.0]
-
-            # Separa los brazos
+            # 2. Abre las manos
+            hands_parameters = [1.0, 1.0]
+            # 3. Separa los brazos
             arms_separate_angles = [0.00383162, 3.8160, -0.00378999, -0.00877543, -4.09046e-05, -9.91789e-05, -3.8160, -9.95662e-05, 0.00881285, 7.63354e-05, 0.5, 0.5]
-
-            # giras los brazos
+            # 4. Gira los brazos
             arms_rotation_angles = [1.55179, 1.56201, 0.0039061, -0.00881861, 0.00328999, 1.57469, -1.56204, 1.21692e-05, 0.00882497, -9.82796e-05, 0-5, 0.5]
-
-            # Bajas los brazos
+            # 5. Bajas los brazos
             arms_lower_angles = [1.57471, 0.0940139, 0.00371943, -0.00879696, 0.00338298, 1.57466, -0.0797469, 2.59231e-05, 0.0087464, 3.54903e-05, 0-5, 0.5]
-            
-            # Subir cadera
+            # 6. Sube la cadera
             hips_raise_angle = [-0.1]
             
-            
-
+            # ===================================== Setting the angles and executing each step ===================================== 
+            # 1. Baja la cadera
             request.name = self.joints_hip
             request.angle = hips_lower_angle
             request.speed = 0.2
@@ -208,13 +214,15 @@ class ManipulationPyServices:
             print(consoleFormatter.format('Hip was lowered according to the angle ', self.joints_hip, 'with the values: ', hips_lower_angle,'!', 'OKGREEN'))
             rospy.sleep(2)
 
+            # 2. Abre las manos
             request.name = self.joint_hands
-            request.angle = hands_angles
+            request.angle = hands_parameters
             request.speed = 0.2
             self.motion_set_angle_client.call(request)
-            print(consoleFormatter.format('Hands were opened according to the angles ', self.joint_hands, ' with the values: ', hands_angles,'!', 'OKGREEN'))
+            print(consoleFormatter.format('Hands were opened according to the parameters ', self.joint_hands, ' with the values: ', hands_parameters,'!', 'OKGREEN'))
             rospy.sleep(2)
 
+            # 3. Separa los brazos
             request.name = self.joints_arms_hands
             request.angle = arms_separate_angles
             request.speed = 0.1
@@ -222,6 +230,7 @@ class ManipulationPyServices:
             print(consoleFormatter.format('Arms were separated according to the angles ', self.joints_arms, ' with the values: ', arms_separate_angles,'!', 'OKGREEN'))
             rospy.sleep(2)
 
+            # 4. Gira los brazos
             request.name = self.joints_arms_hands
             request.angle = arms_rotation_angles
             request.speed = 0.25
@@ -229,6 +238,7 @@ class ManipulationPyServices:
             print(consoleFormatter.format('Arms were rotated according to the angles ', self.joints_arms, ' with the values: ', arms_rotation_angles,'!', 'OKGREEN'))
             rospy.sleep(0.5)
 
+            # 5. Bajas los brazos
             request.name = self.joints_arms_hands
             request.angle = arms_lower_angles
             request.speed = 0.15
@@ -236,6 +246,7 @@ class ManipulationPyServices:
             print(consoleFormatter.format('Arms were lowered according to the angles ', self.joints_arms, ' with the values: ', arms_lower_angles,'!', 'OKGREEN'))
             rospy.sleep(2)
 
+            # 6. Sube la cadera
             request.name = self.joints_hip
             request.angle = hips_raise_angle
             request.speed = 0.15
@@ -246,175 +257,248 @@ class ManipulationPyServices:
             return "Result: Pepper placed her both arms in the position specified."
         
         
+        # Position 2: Placing Pepper's left arm in the specified angles
         elif name == "place_left_arm":
-            # Define the angles for each step
-            angle_1 = [0.522444, 0.00885305, -1.39163, -0.517197, 1.57039]
-            angle_2 = []  # TODO: Define the values related to angle 2
-            angle_3 = [1.0]
-            angle_4 = [0.796941, 1.56198, -1.39166, -0.00880171, 1.3969]
-            angle_5 = [1.56715, 1.56184, -1.39167, -0.00898501, 1.39683]
-            angle_6 = [1.56708, 0.0230135, -1.39941, -0.00876288, -0.230052]
+            # ===================================== Angles definition for each step ===============================================
+            # Primer giro del brazo
+            first_left_arm_rotation_angles = [0.522444, 0.00885305, -1.39163, -0.517197, 1.57039]
+            # Apertura de la mano
+            left_arm_open_parameter = [1.0]
+            # Segundo giro del brazo
+            second_left_arm_rotation_angles = [0.796941, 1.56198, -1.39166, -0.00880171, 1.3969]
+            # Tercer giro del brazo
+            third_left_arm_rotation_angles = [1.56715, 1.56184, -1.39167, -0.00898501, 1.39683]
+            # Desplazamiento del brazo hacia abajo
+            left_arm_lower_angles = [1.56708, 0.0230135, -1.39941, -0.00876288, -0.230052]
 
-            # Set the angles for each step
+            # ===================================== Setting the angles and executing each step ===================================== 
+            # 1. First rotation of the left arm
             request.name = self.joints_left_arm
-            request.angle = angle_1
+            request.angle = first_left_arm_rotation_angles
             request.speed = 0.2
             self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Left arm was rotated according to the angles ', self.joints_left_arm, ' with the values: ', first_left_arm_rotation_angles,'!', 'OKGREEN'))
             rospy.sleep(2)
 
-            request.angle = angle_2
+            # 2. Open the left hand
+            request.angle = left_arm_open_parameter
             self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Left hand was opened according to the angle ', self.joints_left_arm, ' with the values: ', left_arm_open_parameter,'!', 'OKGREEN'))
             rospy.sleep(2)
 
+            # 3. Second rotation of the left arm
             request.name = self.joint_left_hand
-            request.angle = angle_3
+            request.angle = second_left_arm_rotation_angles
             self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Left arm was rotated according to the angles ', self.joints_left_arm, ' with the values: ', second_left_arm_rotation_angles,'!', 'OKGREEN'))
             rospy.sleep(1)
 
-            request.name = self.joints_left_arm
-            request.angle = angle_4
-            self.motion_set_angle_client.call(request)
-            rospy.sleep(2)
-
-            request.angle = angle_5
+            # 4. Third rotation of the left arm
+            request.angle = third_left_arm_rotation_angles
             request.speed = 0.2
             self.motion_set_angle_client.call(request)
-
-            request.angle = angle_6
+            print(consoleFormatter.format('Left arm was rotated according to the angles ', self.joints_left_arm, ' with the values: ', third_left_arm_rotation_angles,'!', 'OKGREEN'))    
+            rospy.sleep(2)
+            
+            # 5. Lower the left arm
+            request.angle = left_arm_lower_angles
             request.speed = 0.1
             self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Left arm was lowered according to the angles ', self.joints_left_arm, ' with the values: ', left_arm_lower_angles,'!', 'OKGREEN'))   
             rospy.sleep(1.5)
 
-            return "place left arm executed"
+            return "Result: Pepper placed her left arm in the position specified."
 
         # Position 3: Placing Pepper's right arm in the specified angles
         elif(name=="place_right_arm"):
+            # ===================================== Angles definition for each step ===============================================
+            # 1. Baja la cadera
+            first_hip_pitch_angle = [-0.3]
+            # 2. Gira la muneca derecha
+            right_wrist_yaw_angle = [-1.6]
+            # 3. Abre la mano derecha
+            right_hand_open_parameter = [1.0]
+            # 4. Primer giro del brazo derecho  
+            first_right_shoulder_elbow_wrist_angles = [0.00385512, -1.56205, 0.00377709, 0.0087872, 4.07988E-05]
+            # 5. Segundo giro del brazo derecho
+            second_right_shoulder_elbow_wrist_angles = [1.60385512, -1.56205, 0.00377709, 0.0087872, 4.07988E-05]
+            # 6. Tercer giro del brazo derecho
+            third_right_shoulder_elbow_wrist_angles = [1.75007, -0.111032, 1.6967, 0.102538, -0.0100479]
+            # 7. Sube la cadera
+            second_hip_pitch_angle = [-0.1]
+            
+            # ===================================== Setting the angles and executing each step ===================================== 
+            # 1. Baja la cadera
             joints_request = SetAngleSrvRequest()
             joints_request.name = ["HipPitch"]
-            joints_request.angle = [-0.3]
+            joints_request.angle = first_hip_pitch_angle
             joints_request.speed = 0.1
-            rospy.sleep(2)
             self.motion_set_angle_client.call(joints_request)
+            print(consoleFormatter.format('Hip was lowered according to the angle ', self.joints_hip, 'with the values: ', first_hip_pitch_angle,'!', 'OKGREEN'))
+            rospy.sleep(2)
+            
+            # 2. Gira la muneca derecha
             joints_request = SetAngleSrvRequest()
             joints_request.name = ["RWristYaw"]
-            joints_request.angle = [-1.6]
+            joints_request.angle = right_wrist_yaw_angle
             joints_request.speed = 0.2
             self.motion_set_angle_client.call(joints_request)
+            print(consoleFormatter.format('Right wrist was rotated according to the angle ', self.joints_right_arm, 'with the values: ', right_wrist_yaw_angle,'!', 'OKGREEN'))
             rospy.sleep(2.2)
 
+            # 3. Abre la mano derecha
             joints_request = SetAngleSrvRequest()
             joints_request.name = ["RHand"]
-            joints_request.angle = [1.0]
+            joints_request.angle = right_hand_open_parameter   
             joints_request.speed = 0.1
             self.motion_set_angle_client.call(joints_request)
-
-
+            print(consoleFormatter.format('Right hand was opened according to the parameter ', self.joint_right_hand, 'with the values: ', right_hand_open_parameter,'!', 'OKGREEN'))   
             rospy.sleep(1.2)
+            
+            # 4. Gira el brazo derecho
             joints_request = SetAngleSrvRequest()
             joints_request.name = ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw']
-            joints_request.angle = [0.00385512, -1.56205, 0.00377709, 0.0087872, 4.07988E-05]
+            joints_request.angle = first_right_shoulder_elbow_wrist_angles
             joints_request.speed = 0.1
             self.motion_set_angle_client.call(joints_request)
+            print(consoleFormatter.format('Right arm (shoulder, elbow, wrist) was rotated for the first time according to the angles ', self.joints_right_arm, 'with the values: ', first_right_shoulder_elbow_wrist_angles,'!', 'OKGREEN'))
             rospy.sleep(2)
+            
+            # 5. Gira el brazo derecho
             joints_request.angle = [1.60385512, -1.56205, 0.00377709, 0.0087872, 4.07988E-05]
             joints_request.speed = 0.25
             self.motion_set_angle_client.call(joints_request)
+            print(consoleFormatter.format('Right arm (shoulder, elbow, wrist) was rotated for the second time according to the angles ', self.joints_right_arm, 'with the values: ', second_right_shoulder_elbow_wrist_angles,'!', 'OKGREEN'))  
             rospy.sleep(0.5)
+            
+            # 6. Gira el brazo derecho
             joints_request.angle = [1.75007, -0.111032, 1.6967, 0.102538, -0.0100479]
             joints_request.speed = 0.15
             self.motion_set_angle_client.call(joints_request)
+            print(consoleFormatter.format('Right arm (shoulder, elbow, wrist) was rotated for the third time according to the angles ', self.joints_right_arm, 'with the values: ', third_right_shoulder_elbow_wrist_angles,'!', 'OKGREEN'))   
             rospy.sleep(2)
+            
+            # 7. Sube la cadera
             joints_request = SetAngleSrvRequest()
             joints_request.name = ["HipPitch"]
             joints_request.angle = [-0.1]
             joints_request.speed = 0.1
-            rospy.sleep(2)
             self.motion_set_angle_client.call(joints_request)
-            return "place right arm executed"
-
-        # Position 4: Placing Pepper's right arm in the specified angles
-        elif(name=="place_right_cereal"):
-            # Ajusta el brazo
-            angle_1 = [0.101243, -0.0705631, 1.39132, 0.199418, 1.79627]
-
-            request.name = self.joints_right_arm
-            request.angle = angle_1
-            request.speed = 0.1
-            res = self.motion_set_angle_client.call(request)
-            rospy.sleep(2)
-
-            # brazo para la tableta rapido
-            angle_2 = [0.101191, -0.0706058, 0.430828, 1.56205, 1.79615]
-
-            request.name = self.joints_right_arm
-            request.angle = angle_2
-            request.speed = 0.32
-            res = self.motion_set_angle_client.call(request)
-            rospy.sleep(0.45)
-
-            # Devuelve brazo a la pose inicial
-            angle_3 = [0.101074, -0.0706477, 0.430851, 0.00882103, 1.79614]
-
-            request.name = self.joints_right_arm
-            request.angle = angle_3
-            request.speed = 0.32
-            res = self.motion_set_angle_client.call(request)
-            rospy.sleep(0.45)
-
-            # Mueve al lado derecho 
-            angle_4 = [0.10472, -0.0523599, 1.39626, 0.191986, 1.81514]
-
-            request.name = self.joints_right_arm
-            request.angle = angle_4
-            request.speed = 0.08
-            res = self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Hip was raised according to the angle ', self.joints_hip, 'with the values: ', second_hip_pitch_angle,'!', 'OKGREEN'))   
             rospy.sleep(2)
             
-            return "place right cereal executed"
+            return "Result: Pepper placed her right arm in the position specified."
+
+        # Position 4: Placing Pepper's right arm in the specified angles (cereal)
+        elif(name=="place_right_cereal"):
+            
+            # ===================================== Angles definition for each step ===============================================
+            # 1. Para ajustar el brazo
+            arm_adjust_angles = [0.101243, -0.0705631, 1.39132, 0.199418, 1.79627]
+            # 2. Para la tableta rapido
+            tablet_angles = [0.101191, -0.0706058, 0.430828, 1.56205, 1.79615]
+            # 3. Devuelve brazo a la pose inicial
+            arm_initial_pose_angles = [0.101074, -0.0706477, 0.430851, 0.00882103, 1.79614]
+            # 4. Mueve al lado derecho
+            arm_move_right_angles = [0.10472, -0.0523599, 1.39626, 0.191986, 1.81514]
+
+            # ===================================== Setting the angles and executing each step ===================================== 
+
+            # 1. Para ajustar el brazo
+            request.name = self.joints_right_arm
+            request.angle = arm_adjust_angles
+            request.speed = 0.1
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Right arm was adjusted the first time according to the angles ', self.joints_right_arm, ' with the values: ', arm_adjust_angles,'!', 'OKGREEN'))    
+            rospy.sleep(2)
+
+            # 2. Para la tableta rapido
+            request.name = self.joints_right_arm
+            request.angle = tablet_angles
+            request.speed = 0.32
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Right arm was adjusted a second time according to the angles ', self.joints_right_arm, ' with the values: ', tablet_angles,'!', 'OKGREEN'))
+            rospy.sleep(0.45)
+
+            # 3. Devuelve brazo a la pose inicial
+            request.name = self.joints_right_arm
+            request.angle = arm_initial_pose_angles
+            request.speed = 0.32
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Right arm was adjusted a third time according to the angles ', self.joints_right_arm, ' with the values: ', arm_initial_pose_angles,'!', 'OKGREEN'))  
+            rospy.sleep(0.45)
+
+            # 4. Mueve al lado derecho
+            request.name = self.joints_right_arm
+            request.angle = arm_move_right_angles
+            request.speed = 0.08
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Right arm was adjusted a fourth time according to the angles ', self.joints_right_arm, ' with the values: ', arm_move_right_angles,'!', 'OKGREEN'))    
+            rospy.sleep(2)
+            
+            return "Result: Pepper placed her right arm in the position specified (cereal)."
             
         # Position 5: Requesting help with both arms
         elif(name == "request_help_both_arms"):
-            angle_1 = [0.285927, 0.088337, -0.79688, -0.866391, -1.82384, 0.285973, -0.0939549, 0.789178, 0.886188, 1.82378]
+            # ===================================== Angles definition for each step ================================================
+            # 1. First movement of both arms
+            first_arms_help_angles = [0.285927, 0.088337, -0.79688, -0.866391, -1.82384, 0.285973, -0.0939549, 0.789178, 0.886188, 1.82378]
+            # 2. Second movement of both arms
+            second_arms_help_angles = [0.316383, 0.00873112, -0.690055, -0.786829, -1.82382, 0.308927, -0.00874898, 0.690114, 0.792578, 1.82378]
+            
+            # ===================================== Setting the angles and executing each step ===================================== 
             request.name = self.joints_arms
-            request.angle = angle_1
+            request.angle = first_arms_help_angles
             request.speed = 0.1
-            res = self.motion_set_angle_client.call(request)
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Both arms were moved the first time according to the angles ', self.joints_arms, ' with the values: ', first_arms_help_angles,'!', 'OKGREEN'))
             rospy.sleep(3)
 
-            angle2 = [0.316383, 0.00873112, -0.690055, -0.786829, -1.82382, 0.308927, -0.00874898, 0.690114, 0.792578, 1.82378]
-            request.angle = angle2
+            request.angle = second_arms_help_angles
             request.speed = 0.1
-            res = self.motion_set_angle_client.call(request)
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Both arms were moved a second time according to the angles ', self.joints_arms, ' with the values: ', second_arms_help_angles,'!', 'OKGREEN'))
             rospy.sleep(2)
 
-            return "request_help_both_arms"
+            return "Result: Pepper requested help with both arms."
 
         # Position 6: Spinning the head
         elif(name == "spin_head"):
-            angle_1 = [-0.436332]
+            # ===================================== Angles definition for each step ================================================
+            # 1. First movement of the head
+            first_head_movement_angle = [-0.436332]
+            # 2. Second movement of the head
+            second_head_movement_angle = [0.436332]
+            
+            # ===================================== Setting the angles and executing each step ===================================== 
+            # 1. First movement of the head
             request.name = ["HeadYaw"]
-            request.angle = angle_1
+            request.angle = first_head_movement_angle
             request.speed = 0.1
-            res = self.motion_set_angle_client.call(request)
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Head was moved the first time according to the angle ', self.joints_head, ' with the values: ', first_head_movement_angle,'!', 'OKGREEN'))
             rospy.sleep(1)
 
-            angle_2 = [0.436332]
+            # 2. Second movement of the head
             request.name = ["HeadYaw"]
-            request.angle = angle_2
+            request.angle = second_head_movement_angle
             request.speed = 0.08
-            res = self.motion_set_angle_client.call(request)
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Head was moved a second time according to the angle ', self.joints_head, ' with the values: ', second_head_movement_angle,'!', 'OKGREEN'))
             rospy.sleep(3)
 
-            request_1 = go_to_stateRequest()
-            request_1.name = "default_head"
-            request_1.speed = 0.1
-            res = self.setState.call(request_1)
+            # 3. Go to pose request
+            pose_request = GoToPoseRequest()
+            pose_request.name = "default_head"
+            pose_request.speed = 0.1
+            self.setState.call(pose_request)
+            print(consoleFormatter.format('Head was moved to the default position!', 'OKGREEN'))
 
-            return "spin_head"
+            return "Result: Pepper spun her head."
 
         # If the action name is not recognized, return an error message
         else: 
-            return "No action name recognized"
+            return "Check the input: The action name written was NOT recognized!"
 
     # ================================== GO TO STATE ========================================
 
@@ -442,7 +526,7 @@ class ManipulationPyServices:
             - List 2: Slightly larger but flat objects like 'bowl' and 'plate' are handled using the 'bowl' state.
             - List 3: Specific items like 'mustard' are handled using a specialized 'master' state for unique cases.
         """
-        request = go_to_stateRequest()
+        request = GoToPoseRequest()
 
         # Predefined lists categorizing objects based on the appropriate grasping strategy
         list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna",
@@ -523,7 +607,7 @@ if __name__ == '__main__':
     consoleFormatter=ConsoleFormatter.ConsoleFormatter()
     try:
         # Initialize the main class responsible for manipulation utilities in the context of this ROS node.
-        manipulation_py_services = ManipulationPyServices()
+        manipulation_py_services = ManipulationPytoolkit()
         # Print a formatted success message indicating the manipulation utilities node has been successfully initialized.
         print(consoleFormatter.format(" --- manipulation utilities node successfully initialized ---","OKGREEN"))
         # Retrieve a list of available ROS services to ensure ROS functionalities are active and accessible.
