@@ -140,16 +140,20 @@ class ManipulationPytoolkit:
         """
 
         # Joints categories
-        request = SetAngleSrvRequest()
+        request = set_angle_srvRequest()
         name = req.name
-        
-        # Read pose angles from CSV file located in data
-        poses_info = csv.DictReader(open('/data/objects_poses.csv', encoding="utf-8"),delimiter=",")
-        poses_angles = {key: [row[key].strip() for row in poses_info if row[key].strip()] for key in poses_info.fieldnames}
-        angle = poses_angles[name]
-        request.name = poses_angles[name][-1]
 
+        poses_info = csv.reader(open('src/manipulation_utilities_pytoolkit/src/data/objects_poses.csv', 'r', encoding='utf-8'))
+        
+        poses_angles = {row[0]: [float(value) for value in row[1:-1] if value.strip()] + [float(row[-1])] for row in poses_info}
+        
+        angle = poses_angles[name]
+        
+        request.name =getattr(self, poses_angles[name][-1])
+        
+        angle.pop()
         request.angle = angle
+        
         request.speed = req.speed
         res = self.motion_set_angle_client.call(request)
         return res.result
