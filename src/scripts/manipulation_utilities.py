@@ -56,7 +56,7 @@ class ManipulationPytoolkit:
         print(consoleFormatter.format('Service grasp_object from manipulation_services is on!', 'OKGREEN'))     
         
         print(consoleFormatter.format('waiting for move_head service!', 'WARNING'))
-        self.move_head = rospy.Service("manipulation_utilities/move_head", grasp_object, self.callback_move_head)
+        self.move_head = rospy.Service("manipulation_utilities/move_head", move_head, self.callback_move_head)
         print(consoleFormatter.format('Service move_head from manipulation_services is on!', 'OKGREEN'))    
         
         # ==================================  MOTION SERVICES DECLARATION ======================================== 
