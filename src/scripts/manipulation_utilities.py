@@ -154,7 +154,7 @@ class ManipulationPytoolkit:
         res = self.motion_set_angle_client.call(request)
         return res.result
 
-    # ================================== GO TO ACTION ========================================
+    # ================================== PLAY ACTION ========================================
 
     def callback_play_action(self, req):
         """
