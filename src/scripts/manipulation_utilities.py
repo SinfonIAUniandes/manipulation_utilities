@@ -12,8 +12,7 @@ import ConsoleFormatter
 
 # ROS messages and services
 from std_srvs.srv import SetBool, SetBoolRequest
-from manipulation_msgs_pytoolkit.srv import set_stiffnesses_srv, set_angle_srv, go_to_pose, play_action, grasp_object
-from manipulation_utilities_pytoolkit import ManipulationPytoolkit
+from manipulation_msgs_pytoolkit.srv import *
 from manipulation_msgs_pytoolkit import setStiffnessesSrvRequest, SetAngleSrvRequest, GoToPoseRequest, PlayActionRequest, GraspObjectRequest
 
 class ManipulationPytoolkit:
@@ -45,16 +44,16 @@ class ManipulationPytoolkit:
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
         print(consoleFormatter.format('waiting for go_to_position service!', 'WARNING'))
-        self.go_to_position= rospy.Service("manipulation_utilities/go_to_position", go_to_pose, self.callback_go_to_pose)
-        print(consoleFormatter.format('Service go_to_position from ManipulationPyServices is on!', 'OKGREEN'))
+        self.go_to_position= rospy.Service("manipulation_utilities/go_to_position", go_to_state, self.callback_go_to_pose)
+        print(consoleFormatter.format('Service go_to_position from manipulation_services is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for play_action service!', 'WARNING'))  
         self.play_action = rospy.Service("manipulation_utilities/play_action", play_action, self.callback_play_action)
-        print(consoleFormatter.format('Service play_action from ManipulationPyServices is on!', 'OKGREEN'))
+        print(consoleFormatter.format('Service play_action from manipulation_services is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for grasp_object service!', 'WARNING'))
         self.grasp_object = rospy.Service("manipulation_utilities/grasp_object", grasp_object, self.callback_grasp_object)
-        print(consoleFormatter.format('Service grasp_object from ManipulationPyServices is on!', 'OKGREEN'))
+        print(consoleFormatter.format('Service grasp_object from manipulation_services is on!', 'OKGREEN'))
         
         
         # ==================================  MOTION SERVICES DECLARATION ======================================== 
