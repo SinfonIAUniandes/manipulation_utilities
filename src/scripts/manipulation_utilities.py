@@ -12,9 +12,7 @@ import ConsoleFormatter
 
 # ROS messages and services
 from std_srvs.srv import SetBool, SetBoolRequest
-from manipulation_msgs_pytoolkit.srv import set_stiffnesses_srv, set_angle_srv, go_to_pose, play_action, grasp_object
-from manipulation_utilities_pytoolkit import ManipulationPytoolkit
-from manipulation_msgs_pytoolkit import setStiffnessesSrvRequest, SetAngleSrvRequest, GoToPoseRequest, PlayActionRequest, GraspObjectRequest
+from manipulation_msgs_pytoolkit.srv import *
 
 class ManipulationPytoolkit:
     
@@ -45,7 +43,7 @@ class ManipulationPytoolkit:
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
         print(consoleFormatter.format('waiting for go_to_position service!', 'WARNING'))
-        self.go_to_position= rospy.Service("manipulation_utilities/go_to_position", go_to_pose, self.callback_go_to_pose)
+        self.go_to_position= rospy.Service("manipulation_utilities/go_to_position", go_to_state, self.callback_go_to_state)
         print(consoleFormatter.format('Service go_to_position from ManipulationPyServices is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for play_action service!', 'WARNING'))  
@@ -103,13 +101,13 @@ class ManipulationPytoolkit:
         req_states.data = False
 
         # Prepare the request for setting joint stiffnesses
-        req_stiffnesses = setStiffnessesSrvRequest()
+        req_stiffnesses = set_stiffnesses_srvRequest()
 
         # Set maximum stiffness for each specified joint
         for joint in self.joints: 
             req_stiffnesses.names = joint
             req_stiffnesses.stiffnesses = 1
-            self.motionSetStiffnessesClient.call(req_stiffnesses)
+            self.motion_set_stiffnesses_client.call(req_stiffnesses)
         
         print(consoleFormatter.format('Initialization of the robot Pepper Completed!', 'OKGREEN'))
         
@@ -117,7 +115,7 @@ class ManipulationPytoolkit:
 
     # ================================== GO TO POSITION ========================================
 
-    def callback_go_to_pose(self, req):
+    def callback_go_to_state(self, req):
         """
         Executes a specific pose for the pepper based on the provided request.
 
@@ -190,7 +188,7 @@ class ManipulationPytoolkit:
         """
         
         
-        request = SetAngleSrvRequest()
+        request = set_angle_srvRequest()
         name = req.name
         
         # Position 1: Placing Pepper's both arms in the specified angles
@@ -333,7 +331,7 @@ class ManipulationPytoolkit:
             
             # ===================================== Setting the angles and executing each step ===================================== 
             # 1. Baja la cadera
-            joints_request = SetAngleSrvRequest()
+            joints_request = set_angle_srvRequest()
             joints_request.name = ["HipPitch"]
             joints_request.angle = first_hip_pitch_angle
             joints_request.speed = 0.1
@@ -342,7 +340,7 @@ class ManipulationPytoolkit:
             rospy.sleep(2)
             
             # 2. Gira la muneca derecha
-            joints_request = SetAngleSrvRequest()
+            joints_request = set_angle_srvRequest()
             joints_request.name = ["RWristYaw"]
             joints_request.angle = right_wrist_yaw_angle
             joints_request.speed = 0.2
@@ -351,7 +349,7 @@ class ManipulationPytoolkit:
             rospy.sleep(2.2)
 
             # 3. Abre la mano derecha
-            joints_request = SetAngleSrvRequest()
+            joints_request = set_angle_srvRequest()
             joints_request.name = ["RHand"]
             joints_request.angle = right_hand_open_parameter   
             joints_request.speed = 0.1
@@ -360,7 +358,7 @@ class ManipulationPytoolkit:
             rospy.sleep(1.2)
             
             # 4. Gira el brazo derecho
-            joints_request = SetAngleSrvRequest()
+            joints_request = set_angle_srvRequest()
             joints_request.name = ['RShoulderPitch', 'RShoulderRoll', 'RElbowYaw', 'RElbowRoll', 'RWristYaw']
             joints_request.angle = first_right_shoulder_elbow_wrist_angles
             joints_request.speed = 0.1
@@ -383,7 +381,7 @@ class ManipulationPytoolkit:
             rospy.sleep(2)
             
             # 7. Sube la cadera
-            joints_request = SetAngleSrvRequest()
+            joints_request = set_angle_srvRequest()
             joints_request.name = ["HipPitch"]
             joints_request.angle = [-0.1]
             joints_request.speed = 0.1
@@ -492,7 +490,7 @@ class ManipulationPytoolkit:
             rospy.sleep(3)
 
             # 3. Go to pose request
-            pose_request = GoToPoseRequest()
+            pose_request = go_to_stateRequest()
             pose_request.name = "default_head"
             pose_request.speed = 0.1
             self.setState.call(pose_request)
@@ -530,7 +528,7 @@ class ManipulationPytoolkit:
             - List 2: Slightly larger but flat objects like 'bowl' and 'plate' are handled using the 'bowl' state.
             - List 3: Specific items like 'mustard' are handled using a specialized 'master' state for unique cases.
         """
-        request = GoToPoseRequest()
+        request = go_to_stateRequest()
 
         # Predefined lists categorizing objects based on the appropriate grasping strategy
         list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna",
@@ -583,7 +581,7 @@ class ManipulationPytoolkit:
             movement service and returns the result of that service call.
 
         """
-        request = SetAngleSrvRequest()
+        request = set_angle_srvRequest()
         joints_head = ["HeadPitch", "HeadYaw"]
         
         # Checks limits for the 'HeadPitch' angle
