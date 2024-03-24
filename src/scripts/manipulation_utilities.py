@@ -43,8 +43,8 @@ class ManipulationPytoolkit:
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
         print(consoleFormatter.format('waiting for go_to_pose service!', 'WARNING'))
-        self.go_to_pose= rospy.Service("manipulation_utilities/go_to_pose", go_to_state, self.callback_go_to_pose)
-        self.set_state = rospy.ServiceProxy("manipulation_utilities/go_to_state", go_to_state)
+        self.go_to_pose= rospy.Service("manipulation_utilities/go_to_pose", go_to_pose, self.callback_go_to_pose)
+        self.set_state = rospy.ServiceProxy("manipulation_utilities/go_to_pose", go_to_pose)
         print(consoleFormatter.format('Service go_to_pose from manipulation_services is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for play_action service!', 'WARNING'))  
@@ -117,7 +117,7 @@ class ManipulationPytoolkit:
         
 ########################################  MANIPULATION SERVICES  ############################################
 
-    # ================================== GO TO pose ========================================
+    # ================================== GO TO POSE ========================================
 
     def callback_go_to_pose(self, req):
         """
