@@ -42,18 +42,22 @@ class ManipulationPytoolkit:
                 
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
-        print(consoleFormatter.format('waiting for go_to_position service!', 'WARNING'))
-        self.go_to_position= rospy.Service("manipulation_utilities/go_to_position", go_to_state, self.callback_go_to_state)
-        print(consoleFormatter.format('Service go_to_position from ManipulationPyServices is on!', 'OKGREEN'))
+        print(consoleFormatter.format('waiting for go_to_pose service!', 'WARNING'))
+        self.go_to_pose= rospy.Service("manipulation_utilities/go_to_pose", go_to_state, self.callback_go_to_pose)
+        self.set_state = rospy.ServiceProxy("manipulation_utilities/go_to_state", go_to_state)
+        print(consoleFormatter.format('Service go_to_pose from manipulation_services is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for play_action service!', 'WARNING'))  
         self.play_action = rospy.Service("manipulation_utilities/play_action", play_action, self.callback_play_action)
-        print(consoleFormatter.format('Service play_action from ManipulationPyServices is on!', 'OKGREEN'))
+        print(consoleFormatter.format('Service play_action from manipulation_services is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for grasp_object service!', 'WARNING'))
         self.grasp_object = rospy.Service("manipulation_utilities/grasp_object", grasp_object, self.callback_grasp_object)
-        print(consoleFormatter.format('Service grasp_object from ManipulationPyServices is on!', 'OKGREEN'))
+        print(consoleFormatter.format('Service grasp_object from manipulation_services is on!', 'OKGREEN'))     
         
+        print(consoleFormatter.format('waiting for move_head service!', 'WARNING'))
+        self.move_head = rospy.Service("manipulation_utilities/move_head", move_head, self.callback_move_head)
+        print(consoleFormatter.format('Service move_head from manipulation_services is on!', 'OKGREEN'))    
         
         # ==================================  MOTION SERVICES DECLARATION ======================================== 
         
@@ -107,15 +111,15 @@ class ManipulationPytoolkit:
         for joint in self.joints: 
             req_stiffnesses.names = joint
             req_stiffnesses.stiffnesses = 1
-            self.motion_set_stiffnesses_client.call(req_stiffnesses)
+            self.motion_set_stiffnesses_client(req_stiffnesses)
         
         print(consoleFormatter.format('Initialization of the robot Pepper Completed!', 'OKGREEN'))
         
 ########################################  MANIPULATION SERVICES  ############################################
 
-    # ================================== GO TO POSITION ========================================
+    # ================================== GO TO pose ========================================
 
-    def callback_go_to_state(self, req):
+    def callback_go_to_pose(self, req):
         """
         Executes a specific pose for the pepper based on the provided request.
 
@@ -140,18 +144,14 @@ class ManipulationPytoolkit:
         # Joints categories
         request = set_angle_srvRequest()
         name = req.name
-
-        poses_info = csv.reader(open('src/manipulation_utilities_pytoolkit/src/data/objects_poses.csv', 'r', encoding='utf-8'))
         
-        poses_angles = {row[0]: [float(value) for value in row[1:-1] if value.strip()] + [float(row[-1])] for row in poses_info}
-        
+        # Read pose angles from CSV file located in data
+        poses_info = csv.DictReader(open('../data/objects_poses.csv', encoding="utf-8"),delimiter=",")
+        poses_angles = {key: [row[key].strip() for row in poses_info if row[key].strip()] for key in poses_info.fieldnames}
         angle = poses_angles[name]
-        
-        request.name =getattr(self, poses_angles[name][-1])
-        
-        angle.pop()
+        request.name = poses_angles[name][-1]
+
         request.angle = angle
-        
         request.speed = req.speed
         res = self.motion_set_angle_client.call(request)
         return res.result
@@ -191,7 +191,7 @@ class ManipulationPytoolkit:
         request = set_angle_srvRequest()
         name = req.name
         
-        # Position 1: Placing Pepper's both arms in the specified angles
+        # pose 1: Placing Pepper's both arms in the specified angles
         if(name=="place_both_arms"):
             # ===================================== Angles definition for each step ===============================================
             # 1. Baja la cadera
@@ -256,10 +256,10 @@ class ManipulationPytoolkit:
             print(consoleFormatter.format('Hips were raised according to the angles ', self.joints_hip, ' with the values: ', hips_raise_angle,'!', 'OKGREEN'))
             rospy.sleep(2)
 
-            return "Result: Pepper placed her both arms in the position specified."
+            return "Result: Pepper placed her both arms in the pose specified."
         
         
-        # Position 2: Placing Pepper's left arm in the specified angles
+        # pose 2: Placing Pepper's left arm in the specified angles
         elif name == "place_left_arm":
             # ===================================== Angles definition for each step ===============================================
             # Primer giro del brazo
@@ -309,9 +309,9 @@ class ManipulationPytoolkit:
             print(consoleFormatter.format('Left arm was lowered according to the angles ', self.joints_left_arm, ' with the values: ', left_arm_lower_angles,'!', 'OKGREEN'))   
             rospy.sleep(1.5)
 
-            return "Result: Pepper placed her left arm in the position specified."
+            return "Result: Pepper placed her left arm in the pose specified."
 
-        # Position 3: Placing Pepper's right arm in the specified angles
+        # pose 3: Placing Pepper's right arm in the specified angles
         elif(name=="place_right_arm"):
             # ===================================== Angles definition for each step ===============================================
             # 1. Baja la cadera
@@ -389,9 +389,9 @@ class ManipulationPytoolkit:
             print(consoleFormatter.format('Hip was raised according to the angle ', self.joints_hip, 'with the values: ', second_hip_pitch_angle,'!', 'OKGREEN'))   
             rospy.sleep(2)
             
-            return "Result: Pepper placed her right arm in the position specified."
+            return "Result: Pepper placed her right arm in the pose specified."
 
-        # Position 4: Placing Pepper's right arm in the specified angles (cereal)
+        # pose 4: Placing Pepper's right arm in the specified angles (cereal)
         elif(name=="place_right_cereal"):
             
             # ===================================== Angles definition for each step ===============================================
@@ -438,9 +438,9 @@ class ManipulationPytoolkit:
             print(consoleFormatter.format('Right arm was adjusted a fourth time according to the angles ', self.joints_right_arm, ' with the values: ', arm_move_right_angles,'!', 'OKGREEN'))    
             rospy.sleep(2)
             
-            return "Result: Pepper placed her right arm in the position specified (cereal)."
+            return "Result: Pepper placed her right arm in the pose specified (cereal)."
             
-        # Position 5: Requesting help with both arms
+        # pose 5: Requesting help with both arms
         elif(name == "request_help_both_arms"):
             # ===================================== Angles definition for each step ================================================
             # 1. First movement of both arms
@@ -464,7 +464,7 @@ class ManipulationPytoolkit:
 
             return "Result: Pepper requested help with both arms."
 
-        # Position 6: Spinning the head
+        # pose 6: Spinning the head
         elif(name == "spin_head"):
             # ===================================== Angles definition for each step ================================================
             # 1. First movement of the head
@@ -489,12 +489,12 @@ class ManipulationPytoolkit:
             print(consoleFormatter.format('Head was moved a second time according to the angle ', self.joints_head, ' with the values: ', second_head_movement_angle,'!', 'OKGREEN'))
             rospy.sleep(3)
 
-            # 3. Go to pose request
+            # 3. Go to state request
             pose_request = go_to_stateRequest()
             pose_request.name = "default_head"
             pose_request.speed = 0.1
-            self.setState.call(pose_request)
-            print(consoleFormatter.format('Head was moved to the default position!', 'OKGREEN'))
+            self.motion_set_angle_client.call(request)
+            print(consoleFormatter.format('Head was moved to the default pose!', 'OKGREEN'))
 
             return "Result: Pepper spun her head."
 
@@ -541,19 +541,19 @@ class ManipulationPytoolkit:
         if(name_object in list_1):
             request.name = "small_object_left_hand"
             request.speed = 0.1
-            res = self.setState.call(request)
+            res = self.set_state.call(request)
             return res.result
         
         elif(name_object in list_2):
             request.name = "bowl"
             request.speed = 0.1
-            res = self.setState.call(request)
+            res = self.set_state.call(request)
             return res.result
         
         elif(name_object in list_3):
             request.name = "master"
             request.speed = 0.1
-            res = self.setState.call(request)
+            res = self.set_state.call(request)
             return res.result
 
         else:
