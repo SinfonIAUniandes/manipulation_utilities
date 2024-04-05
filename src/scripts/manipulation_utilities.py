@@ -517,7 +517,7 @@ class ManipulationPytoolkit:
         else: 
             return "Check the input: The action name written was NOT recognized!"
 
-    # ================================== GO TO STATE ========================================
+    # ================================== GRASP OBJECT ========================================
 
     def callback_grasp_object(self, req):
         """
