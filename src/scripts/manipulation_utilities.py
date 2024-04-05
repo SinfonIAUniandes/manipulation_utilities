@@ -145,20 +145,31 @@ class ManipulationPytoolkit:
         request = set_angle_srvRequest()
         name = req.name
 
-        poses_info = csv.reader(open('src/manipulation_utilities_pytoolkit/src/data/objects_poses.csv', 'r', encoding='utf-8'))
+        poses_info = csv.reader(open('src/manipulation_utilities/src/data/objects_poses.csv', 'r', encoding='utf-8'))
         
-        poses_angles = {row[0]: [float(value) for value in row[1:-1] if value.strip()] + [float(row[-1])] for row in poses_info}
-        
-        angle = poses_angles[name]
-        
-        request.name =getattr(self, poses_angles[name][-1])
-        
-        angle.pop()
-        request.angle = angle
-        
-        request.speed = req.speed
-        res = self.motion_set_angle_client.call(request)
-        return res.result
+        poses_angles = {}
+        for row in poses_info:
+            pose_name = row[0]
+            angles = []
+            for value in row[1:-1]:
+                try:
+                    angles.append(float(value.strip()))
+                except ValueError:
+                    pass
+            joint_category = row[-1].strip()
+            poses_angles[pose_name] = (angles, joint_category)
+
+        if name in poses_angles:
+            angle, joint_category = poses_angles[name]
+            if hasattr(self, joint_category):
+                request = set_angle_srvRequest()
+                request.name = getattr(self, joint_category)
+                request.angle = angle
+                request.speed = req.speed
+                res = self.motion_set_angle_client.call(request)
+                return res.result
+        else:
+            return (f"Pose '{name}' not found in the poses information.")
 
     # ================================== PLAY ACTION ========================================
 
@@ -532,7 +543,7 @@ class ManipulationPytoolkit:
             - List 2: Slightly larger but flat objects like 'bowl' and 'plate' are handled using the 'bowl' state.
             - List 3: Specific items like 'mustard' are handled using a specialized 'master' state for unique cases.
         """
-        request = go_to_stateRequest()
+        request = go_to_poseRequest()
 
         # Predefined lists categorizing objects based on the appropriate grasping strategy
         list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna",
