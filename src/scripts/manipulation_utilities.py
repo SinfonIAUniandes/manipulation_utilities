@@ -43,8 +43,8 @@ class ManipulationPytoolkit:
         # ==============================  MANIPULATION SERVICES DECLARATION ========================================
         
         print(consoleFormatter.format('waiting for go_to_pose service!', 'WARNING'))
-        self.go_to_pose= rospy.Service("manipulation_utilities/go_to_pose", go_to_state, self.callback_go_to_pose)
-        self.set_state = rospy.ServiceProxy("manipulation_utilities/go_to_state", go_to_state)
+        self.go_to_pose= rospy.Service("manipulation_utilities/go_to_pose", go_to_pose, self.callback_go_to_pose)
+        self.set_state = rospy.ServiceProxy("manipulation_utilities/go_to_pose", go_to_pose)
         print(consoleFormatter.format('Service go_to_pose from manipulation_services is on!', 'OKGREEN'))
 
         print(consoleFormatter.format('waiting for play_action service!', 'WARNING'))  
@@ -117,7 +117,7 @@ class ManipulationPytoolkit:
         
 ########################################  MANIPULATION SERVICES  ############################################
 
-    # ================================== GO TO pose ========================================
+    # ================================== GO TO POSE ========================================
 
     def callback_go_to_pose(self, req):
         """
@@ -144,17 +144,32 @@ class ManipulationPytoolkit:
         # Joints categories
         request = set_angle_srvRequest()
         name = req.name
-        
-        # Read pose angles from CSV file located in data
-        poses_info = csv.DictReader(open('../data/objects_poses.csv', encoding="utf-8"),delimiter=",")
-        poses_angles = {key: [row[key].strip() for row in poses_info if row[key].strip()] for key in poses_info.fieldnames}
-        angle = poses_angles[name]
-        request.name = poses_angles[name][-1]
 
-        request.angle = angle
-        request.speed = req.speed
-        res = self.motion_set_angle_client.call(request)
-        return res.result
+        poses_info = csv.reader(open('src/manipulation_utilities/src/data/objects_poses.csv', 'r', encoding='utf-8'))
+        
+        poses_angles = {}
+        for row in poses_info:
+            pose_name = row[0]
+            angles = []
+            for value in row[1:-1]:
+                try:
+                    angles.append(float(value.strip()))
+                except ValueError:
+                    pass
+            joint_category = row[-1].strip()
+            poses_angles[pose_name] = (angles, joint_category)
+
+        if name in poses_angles:
+            angle, joint_category = poses_angles[name]
+            if hasattr(self, joint_category):
+                request = set_angle_srvRequest()
+                request.name = getattr(self, joint_category)
+                request.angle = angle
+                request.speed = req.speed
+                res = self.motion_set_angle_client.call(request)
+                return res.result
+        else:
+            return (f"Pose '{name}' not found in the poses information.")
 
     # ================================== PLAY ACTION ========================================
 
@@ -502,7 +517,7 @@ class ManipulationPytoolkit:
         else: 
             return "Check the input: The action name written was NOT recognized!"
 
-    # ================================== GO TO STATE ========================================
+    # ================================== GRASP OBJECT ========================================
 
     def callback_grasp_object(self, req):
         """
@@ -528,7 +543,7 @@ class ManipulationPytoolkit:
             - List 2: Slightly larger but flat objects like 'bowl' and 'plate' are handled using the 'bowl' state.
             - List 3: Specific items like 'mustard' are handled using a specialized 'master' state for unique cases.
         """
-        request = go_to_stateRequest()
+        request = go_to_poseRequest()
 
         # Predefined lists categorizing objects based on the appropriate grasping strategy
         list_1 = ["fork", "spoon", "knife", "mug", "bottle", "cereal_box", "milk", "tuna",
