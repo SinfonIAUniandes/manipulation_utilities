@@ -273,7 +273,6 @@ class ManipulationPytoolkit:
 
             return "Result: Pepper placed her both arms in the pose specified."
         
-        
         # pose 2: Placing Pepper's left arm in the specified angles
         elif name == "place_left_arm":
             # ===================================== Angles definition for each step ===============================================
@@ -478,7 +477,7 @@ class ManipulationPytoolkit:
             rospy.sleep(2)
 
             return "Result: Pepper requested help with both arms."
-
+        
         # pose 6: Spinning the head
         elif(name == "spin_head"):
             # ===================================== Angles definition for each step ================================================
@@ -512,6 +511,76 @@ class ManipulationPytoolkit:
             print(consoleFormatter.format('Head was moved to the default pose!', 'OKGREEN'))
 
             return "Result: Pepper spun her head."
+
+        elif(name=="pick_milk_carton"):
+            # ===================================== Angles definition for each step ================================================
+            
+            # 1. First movement of both arms
+            first_arms_help_angles = [0.285927, 0.226893, -0.79688, -0.866391, -0.767945, 0.285973, -0.226893, 0.789178, 0.886188, 0.767945]
+            
+            hands_parameters = [0.872665, 0.872665]
+            
+            # 2. Second movement of both arms
+            second_arms_help_angles = [0.285927, 0.0174533 , -0.79688, -0.866391, -0.767945, 0.285973, -0.0174533, 0.789178, 0.886188, 0.767945]
+            
+            # ===================================== Setting the angles and executing each step ===================================== 
+            
+            request.name = self.joint_hands
+            request.angle = hands_parameters
+            request.speed = 0.2
+            self.motion_set_angle_client.call(request)
+            #print(consoleFormatter.format('Hands were opened according to the parameters ', self.joint_hands, ' with the values: ', hands_parameters,'!', 'OKGREEN'))
+            rospy.sleep(2)
+            
+            request.name = self.joints_arms
+            request.angle = first_arms_help_angles
+            request.speed = 0.1
+            self.motion_set_angle_client.call(request)
+            #print(consoleFormater.format('Both arms were moved the first time according to the angles ', self.joints_arms, ' with the values: ', first_arms_help_angles,'!', 'OKGREEN'))
+            rospy.sleep(3)
+
+            request.angle = second_arms_help_angles
+            request.speed = 0.1
+            self.motion_set_angle_client.call(request)
+            #print(consoleFormatter.format('Both arms were moved a second time according to the angles ', self.joints_arms, ' with the values: ', second_arms_help_angles,'!', 'OKGREEN'))
+            rospy.sleep(2)
+            
+            return "Result: Pepper placed her both arms in the pose specified."
+
+        elif(name=="pick_cereal_box"):
+            # ===================================== Angles definition for each step ================================================
+            
+            # 1. First movement of both arms
+            first_arms_help_angles = [0.285927, 0.279253, -0.79688, -0.866391, -0.767945, 0.285973, -0.279253, 0.789178, 0.886188, 0.767945]
+            
+            hands_parameters = [0.872665, 0.872665]
+            
+            # 2. Second movement of both arms
+            second_arms_help_angles = [0.285927, 0.122173 , -0.79688, -0.866391, -0.767945, 0.285973, -0.122173, 0.789178, 0.886188, 0.767945]
+            
+            # ===================================== Setting the angles and executing each step ===================================== 
+            
+            request.name = self.joint_hands
+            request.angle = hands_parameters
+            request.speed = 0.2
+            self.motion_set_angle_client.call(request)
+            #print(consoleFormatter.format('Hands were opened according to the parameters ', self.joint_hands, ' with the values: ', hands_parameters,'!', 'OKGREEN'))
+            rospy.sleep(2)
+            
+            request.name = self.joints_arms
+            request.angle = first_arms_help_angles
+            request.speed = 0.1
+            self.motion_set_angle_client.call(request)
+            #print(consoleFormater.format('Both arms were moved the first time according to the angles ', self.joints_arms, ' with the values: ', first_arms_help_angles,'!', 'OKGREEN'))
+            rospy.sleep(3)
+
+            request.angle = second_arms_help_angles
+            request.speed = 0.1
+            self.motion_set_angle_client.call(request)
+            #print(consoleFormatter.format('Both arms were moved a second time according to the angles ', self.joints_arms, ' with the values: ', second_arms_help_angles,'!', 'OKGREEN'))
+            rospy.sleep(2)
+            
+            return "Result: Pepper placed her both arms in the pose specified."
 
         # If the action name is not recognized, return an error message
         else: 
