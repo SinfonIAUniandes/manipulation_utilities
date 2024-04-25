@@ -21,7 +21,7 @@ mkdir -p manipulation_ws/src
 ```
 
 ## Installation
-To download manipulation_msgs and manipulation_utilities:
+Clone the following repositories into the manipulation_ws/src directory:
 ```ROS
 git clone https://github.com/SinfonIAUniandes/manipulation_msgs.git	
 git clone https://github.com/SinfonIAUniandes/manipulation_utilities.git
@@ -40,6 +40,7 @@ source .devel/setup.bash
 ## Environment Variables
 Manipulation requires the following environment variables.
  ```bash
+nano .bashrc
 export ROBOT="PEPPER"
 export PEPPER_IP=$(HOSTNAME)
 export ROS_MASTER_URI=http://$PEPPER_IP:11311
