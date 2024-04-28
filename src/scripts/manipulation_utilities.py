@@ -12,7 +12,7 @@ import ConsoleFormatter
 
 # ROS messages and services
 from std_srvs.srv import SetBool, SetBoolRequest
-from manipulation_msgs_pytoolkit.srv import *
+from manipulation_msgs.srv import *
 
 class ManipulationPytoolkit:
     
@@ -504,7 +504,7 @@ class ManipulationPytoolkit:
             rospy.sleep(3)
 
             # 3. Go to state request
-            pose_request = go_to_stateRequest()
+            pose_request = go_to_poseRequest()
             pose_request.name = "default_head"
             pose_request.speed = 0.1
             self.motion_set_angle_client.call(request)
