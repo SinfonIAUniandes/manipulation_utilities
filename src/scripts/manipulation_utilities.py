@@ -12,7 +12,7 @@ import ConsoleFormatter
 
 # ROS messages and services
 from std_srvs.srv import SetBool, SetBoolRequest
-from manipulation_msgs_pytoolkit.srv import *
+from manipulation_msgs.srv import *
 
 class ManipulationPytoolkit:
     
