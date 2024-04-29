@@ -47,6 +47,10 @@ class ManipulationPytoolkit:
         self.set_state = rospy.ServiceProxy("manipulation_utilities/go_to_pose", go_to_pose)
         print(consoleFormatter.format('Service go_to_pose from manipulation_services is on!', 'OKGREEN'))
 
+        print(consoleFormatter.format('waiting for go_to_sequence service!', 'WARNING'))
+        self.go_to_sequence = rospy.Service("manipulation_utilities/go_to_sequence", go_to_sequence, self.callback_go_to_sequence)
+        print(consoleFormatter.format('Service go_to_sequence from manipulation_services is on!', 'OKGREEN'))    
+
         print(consoleFormatter.format('waiting for play_action service!', 'WARNING'))  
         self.play_action = rospy.Service("manipulation_utilities/play_action", play_action, self.callback_play_action)
         print(consoleFormatter.format('Service play_action from manipulation_services is on!', 'OKGREEN'))
@@ -170,6 +174,29 @@ class ManipulationPytoolkit:
                 return res.result
         else:
             return (f"Pose '{name}' not found in the poses information.")
+        
+    def callback_go_to_sequence(self, req):
+        """
+        Executes a list of poses for the pepper based on the provided request.
+
+        Parameters:
+            req (RequestMessageType): A request object containing the following attributes:
+                - name (str): The name of the pose or movement to execute. This name should correspond to an entry
+                in the 'objects_poses.csv' file.
+                - speed (float): The speed at which the joints should move to reach the specified angles.
+
+        Returns:
+            ResultType: The result of the service call to set the pepper joint angles. The specific type of this
+            result depends on the service definition used by `motion_set_angle_client`.
+
+        Raises:
+            Exception: If there's an error in reading the CSV file or if the requested pose is not found in the file.
+        """
+
+        for i in req.poses:
+            msg = self.callback_go_to_pose(self, i)
+            return msg
+
 
     # ================================== PLAY ACTION ========================================
 
