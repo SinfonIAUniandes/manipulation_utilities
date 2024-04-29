@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>manipulation_utilities_pytoolkit</name>
+  <name>manipulation_utilities</name>
   <version>0.0.0</version>
-  <description>The manipulation_utilities_pytoolkit package</description>
+  <description>The manipulation_utilities package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
