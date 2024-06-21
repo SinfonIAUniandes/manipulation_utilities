@@ -31,6 +31,5 @@ open_both_hands,,,,,,,,,,,1.0, 1.0,,,joint_hands
 almost_open_both_hands,,,,,,,,,,,0.75, 0.75,,,joint_hands
 close_both_hands,,,,,,,,,,,0.0, 0.0,,,joint_hands
 almost_close_both_hands,,,,,,,,,,,0.25, 0.25,,,joint_hands
-
 small_object_left_high, -0.50472, -0.0523599, -1.39626, -0.191986, -1.815149,,,,,,,,,,joints_left_arm
 small_object_right_high,,,,, -0.50472, -0.0523599, 1.39626, 0.191986, 1.81514,,,,,,joints_right_arm
