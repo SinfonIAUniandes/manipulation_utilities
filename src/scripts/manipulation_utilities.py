@@ -12,6 +12,7 @@ import ConsoleFormatter
 
 # ROS messages and services
 from std_srvs.srv import SetBool, SetBoolRequest
+from robot_toolkit_msgs.srv import set_angle_srv, set_angle_srvRequest
 from manipulation_msgs.srv import *
 
 class ManipulationPytoolkit:
