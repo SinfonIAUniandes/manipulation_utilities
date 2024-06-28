@@ -141,7 +141,7 @@ class ManipulationPytoolkit:
         request = set_angle_srvRequest()
         name = req.name
 
-        poses_info = csv.reader(open('src/manipulation_utilities/src/data/objects_poses.csv', 'r', encoding='utf-8'))
+        poses_info = csv.reader(open('src/manipulation_utilities/src/data/robocup_2024.csv', 'r', encoding='utf-8'))
         
         poses_angles = {}
         for row in poses_info:

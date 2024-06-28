@@ -1,0 +1,13 @@
+poseName, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, LHand, RHand, HeadPitch, HeadYaw, Joints
+up_head,,,,,,,,,,,,,-0.45, 0.0,joints_head
+down_head,,,,,,,,,,,,,0.46, 0.0,joints_head
+default_head,,,,,,,,,,,,,0.0, 0.0,joints_head
+close_both_hands,,,,,,,,,,,0.0, 0.0,,,joint_hands
+almost_open_both_hands,,,,,,,,,,,0.75, 0.75,,,joint_hands
+open_both_hands,,,,,,,,,,,1.0, 1.0,,,joint_hands
+point_there, 0.0, 0.0, -2.086, 0.0, -0.523, 1.285, 0.0, 0.0, 0.0, 1.823,,,,,joints_arms
+small_object_left_high, -0.50472, -0.0523599, -1.39626, -0.191986, -1.815149,,,,,,,,,,joints_left_arm
+small_object_right_high,,,,, -0.50472, -0.0523599, 1.39626, 0.191986, 1.81514,,,,,,joints_right_arm
+grab_plate_vertically, -0.2, -0.3, 0.0, -1.0, -1.5, -0.2, 0.3, 0.0, 1.0, 1.5,,,,, joints_arms
+prepare_2_grab, -0.2, -0.6, 0.0, -0.5, -1.5, -0.2, 0.6, 0.0, 0.5, 1.5,,,,, joints_arms
+carry_cutlery, 0.0, 0.0, -2.086, 0.0, 0.4, 1.285, 0.0, 0.0, 0.0, 1.823,,,,,joints_arms
