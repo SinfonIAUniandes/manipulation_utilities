@@ -57,6 +57,8 @@ test, -0.850039, 0.0087,0.0,-0.840194,-1.82857, -0.34668,-0.0087,-0.078233,0.932
 bowl_hands,,,,,,,,,,,0.6, 0.6,,,joint_hands
 small_object_left_high, -0.50472, -0.0523599, -1.39626, -0.191986, -1.815149,,,,,,,,,,joints_left_arm
 small_object_right_high,,,,, -0.50472, -0.0523599, 1.39626, 0.191986, 1.81514,,,,,,joints_right_arm
+small_object_left_high_2, -2.0857 , 1.5620,-0.4857, -1.5620,0.0 ,,,,,,,,,,joints_left_arm
+small_object_right_high_2,,,,, -2.0857 , -1.5620,0.4857, 1.5620,0.0,,,,,,joints_right_arm
 point_there, 0.0, 0.0, -2.086, 0.0, -0.523, 1.285, 0.0, 0.0, 0.0, 1.823,,,,,joints_arms
 grab_plate_vertically, -0.2, -0.3, 0.0, -1.0, -1.5, -0.2, 0.3, 0.0, 1.0, 1.5,,,,, joints_arms
 prepare_2_grab, -0.2, -0.6, 0.0, -0.5, -1.5, -0.2, 0.6, 0.0, 0.5, 1.5,,,,, joints_arms
