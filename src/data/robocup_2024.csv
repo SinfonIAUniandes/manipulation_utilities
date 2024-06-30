@@ -1,0 +1,28 @@
+poseName, LShoulderPitch, LShoulderRoll, LElbowYaw, LElbowRoll, LWristYaw, RShoulderPitch, RShoulderRoll, RElbowYaw, RElbowRoll, RWristYaw, LHand, RHand, HeadPitch, HeadYaw, Joints
+standard, 1.56717, 0.00878502, -1.56704, -0.00877923, -9.88085e-06, 1.55183, -0.00874544, -0.00385945, 0.00877765, 1.82379,,,,,joints_arms
+up_head,,,,,,,,,,,,,-0.45, 0.0,joints_head
+down_head,,,,,,,,,,,,,0.45, 0.0,joints_head
+default_head,,,,,,,,,,,,,0.0, 0.0,joints_head
+open_both_hands,,,,,,,,,,,1.0, 1.0,,,joint_hands
+close_both_hands,,,,,,,,,,,0.0, 0.0,,,joint_hands
+almost_open_both_hands,,,,,,,,,,,0.75, 0.75,,,joint_hands
+almost_close_both_hands,,,,,,,,,,,0.25, 0.25,,,joint_hands
+bowl_hands,,,,,,,,,,,0.6, 0.6,,,joint_hands
+point_there_right,,,,,, 0.1, 0.0, -0.2, 0.2, 1.8,,,,,joints_right_arm
+small_object_left_high, -0.50472, -0.0523599, -1.39626, -0.191986, -1.815149,,,,,,,,,,joints_left_arm
+small_object_right_high,,,,, -0.50472, -0.0523599, 1.39626, 0.191986, 1.81514,,,,,,joints_right_arm
+grab_plate_vertically, -0.2, -0.3, 0.0, -1.0, -1.5, -0.2, 0.3, 0.0, 1.0, 1.5,,,,, joints_arms
+prepare_2_grab, -0.2, -0.6, 0.0, -0.5, -1.5, -0.2, 0.6, 0.0, 0.5, 1.5,,,,, joints_arms
+prepare_2_grab_mid, -0.2, -0.6, 0.0, -0.3, -1.5, -0.2, 0.6, 0.0, 0.3, 1.5,,,,, joints_arms
+prepare_2_grab_big, -0.2, -0.6, 0.0, -0.2, -1.5, -0.2, 0.6, 0.0, 0.2, 1.5,,,,, joints_arms
+carry_cutlery, 0.0, 0.0, -2.086, 0.0, 0.4, 1.285, 0.0, 0.0, 0.0, 1.823,,,,,joints_arms
+grab_mid, -0.2, -0.6, 0.0, -0.6, -1.5, -0.2, 0.6, 0.0, 0.6, 1.5,,,,, joints_arms
+grab_big, -0.2, -0.6, 0.0, -0.4, -1.5, -0.2, 0.6, 0.0, 0.4, 1.5,,,,, joints_arms
+grab_mid_up, -0.4, -0.6, 0.0, -0.6, -1.5, -0.4, 0.6, 0.0, 0.6, 1.5,,,,, joints_arms
+grab_big_up, -0.4, -0.6, 0.0, -0.4, -1.5, -0.4, 0.6, 0.0, 0.4, 1.5,,,,, joints_arms
+prepare_2_bowl,0.6,0.0,-0.8,-0.9,-1.1,0.6,0.0,0.8,0.9,1.1,,,,,joints_arms
+grab_bowl,0.6,0.0,-0.8,-1.1,-1.1,0.6,0.0,0.8,1.1,1.1,,,,,joints_arms
+grab_bowl_up,0.2,0.0,-0.8,-1.1,-1.1,0.2,0.0,0.8,1.1,1.1,,,,,joints_arms
+serve_cereal, -0.4, -0.6, 0.1, -0.6, -0.9, -0.1, 0.6, 0.2, 0.6, 1.8,,,,, joints_arms
+shake_cereal_1, -0.4, -0.6, 0.1, -0.5, -0.9, -0.1, 0.6, 0.2, 0.7, 1.8,,,,, joints_arms
+shake_cereal_2, -0.4, -0.6, 0.1, -0.7, -0.9, -0.1, 0.6, 0.2, 0.5, 1.8,,,,, joints_arms
